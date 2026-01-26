@@ -669,177 +669,133 @@
     </div>
 
     <script>
-        window.addEventListener('scroll', () => {
-            const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-            const scrolled = window.scrollY;
-            document.getElementById('progressBar').style.width = (scrolled / scrollable * 100) + '%';
-        });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.15 });
-
-        document.querySelectorAll('.section').forEach(section => {
-            observer.observe(section);
-        });
-
-        // Votes stored per section
-        const votes = {
-            1: parseInt(localStorage.getItem('votes-1') || '0'),
-            2: parseInt(localStorage.getItem('votes-2') || '0'),
-            3: parseInt(localStorage.getItem('votes-3') || '0')
-        };
-
-        // Per-browser voted flag per section: null | 'up' | 'down'
-        const voted = {
-            1: localStorage.getItem('voted-1') || null,
-            2: localStorage.getItem('voted-2') || null,
-            3: localStorage.getItem('voted-3') || null
-        };
-
-        function updateDisplay(section) {
-            const count = votes[section];
-            const text = count === 1 ? 'vote' : 'votes';
-            document.getElementById(`votes-${section}`).textContent = `${count} ${text}`;
-
-            // disable buttons if already voted in this browser
-            const sectionElem = document.querySelector(`.section[data-section="${section}"]`);
-            if (sectionElem) {
-                const upBtn = sectionElem.querySelector('.vote-btn.upvote');
-                const downBtn = sectionElem.querySelector('.vote-btn.downvote');
-                if (voted[section]) {
-                    upBtn.disabled = true;
-                    downBtn.disabled = true;
-                } else {
-                    upBtn.disabled = false;
-                    downBtn.disabled = false;
-                }
-            }
+      // --- CONFIG: set this to your deployed Apps Script web app URL ---
+      const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxH8V_aAe8dlbzHBJlzDAviXmpuupKCQu_YI3_T2BpM3CYcy-_3ma74f-QSAML9yBfh4g/exec'; // <-- replace
+    
+      // helper: generate a stable voter id stored in localStorage
+      function getVoterId() {
+        let id = localStorage.getItem('cv_voter_id');
+        if (!id) {
+          // simple UUID v4
+          id = 'v_' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+          );
+          localStorage.setItem('cv_voter_id', id);
         }
-
-        function vote(section, type) {
-            // Only allow one vote per browser per section
-            if (voted[section]) {
-                alert('You already voted in this browser for this section.');
-                return;
-            }
-
-            // update counts
-            votes[section] += (type === 'up' ? 1 : -1);
-            // save totals and voted flag
-            localStorage.setItem(`votes-${section}`, votes[section].toString());
-            voted[section] = type;
-            localStorage.setItem(`voted-${section}`, type);
-
-            updateDisplay(section);
-
-            // animate the clicked button visually
-            const sectionElem = document.querySelector(`.section[data-section="${section}"]`);
-            if (sectionElem) {
-                const btn = sectionElem.querySelector(`.vote-btn.${type === 'up' ? 'upvote' : 'downvote'}`);
-                if (btn) {
-                    btn.style.transform = 'scale(0.95)';
-                    setTimeout(() => btn.style.transform = '', 150);
-                }
-            }
+        return id;
+      }
+    
+      // update UI vote counts
+      function updateDisplay(section, counts) {
+        const count = (counts && counts[String(section)]) ? counts[String(section)] : 0;
+        const text = Math.abs(count) === 1 ? 'vote' : 'votes';
+        const el = document.getElementById(`votes-${section}`);
+        if (el) el.textContent = `${count} ${text}`;
+      }
+    
+      // fetch counts from server (GET)
+      async function fetchCountsFromServer() {
+        try {
+          const res = await fetch(WEBAPP_URL);
+          const j = await res.json();
+          if (j && j.success && j.counts) {
+            updateDisplay(1, j.counts);
+            updateDisplay(2, j.counts);
+            updateDisplay(3, j.counts);
+          }
+        } catch (err) {
+          console.warn('Could not fetch counts:', err);
         }
-
-        [1, 2, 3].forEach(updateDisplay);
-
-        /* === New: modal open and fit-toggle behavior === */
-
-        // Open modal with clicked image, set caption from alt text if present
-        function openModal(imgSrc, caption) {
-            const modal = document.getElementById('modal');
-            const modalImg = document.getElementById('modalImg');
-            const modalCaption = document.getElementById('modalCaption');
-            modalImg.src = imgSrc;
-            modalCaption.textContent = caption || '';
-            modal.classList.add('open');
+      }
+    
+      // client-side guard: mark voted sections in localStorage and disable buttons
+      function markVotedLocal(section) {
+        localStorage.setItem(`voted_section_${section}`, '1');
+        disableVoteButtons(section, true);
+      }
+      function hasVotedLocal(section) {
+        return localStorage.getItem(`voted_section_${section}`) === '1';
+      }
+      function disableVoteButtons(section, disable) {
+        const sectionEl = document.querySelector(`.section[data-section="${section}"]`);
+        if (!sectionEl) return;
+        const up = sectionEl.querySelector('.vote-btn.upvote');
+        const down = sectionEl.querySelector('.vote-btn.downvote');
+        if (up) up.disabled = disable;
+        if (down) down.disabled = disable;
+        if (disable) {
+          if (up) up.style.opacity = 0.6;
+          if (down) down.style.opacity = 0.6;
+        } else {
+          if (up) up.style.opacity = 1;
+          if (down) down.style.opacity = 1;
         }
-
-        function closeModal(e) {
-            // if click was on the close button or outside the image area
-            if (e && e.target && (e.target.classList.contains('modal') || e.target.classList.contains('modal-close'))) {
-                const modal = document.getElementById('modal');
-                modal.classList.remove('open');
-                document.getElementById('modalImg').src = '';
-                document.getElementById('modalCaption').textContent = '';
-            }
+      }
+    
+      // send vote to server via POST
+      async function sendVoteToServer(section, type) {
+        const voterId = getVoterId();
+        try {
+          const resp = await fetch(WEBAPP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ voter_id: voterId, section: String(section), type: type })
+          });
+          const j = await resp.json();
+          return j;
+        } catch (err) {
+          console.error('Vote request failed', err);
+          return { success: false, error: 'network' };
         }
-
-        // Attach listeners: clicking the photo-wrapper opens modal,
-        // clicking the fit-toggle button toggles between cover/contain
-        document.querySelectorAll('.photo-card').forEach(card => {
-            const wrapper = card.querySelector('.photo-wrapper');
-            const img = card.querySelector('img');
-            const toggle = card.querySelector('.fit-toggle');
-
-            // open modal on wrapper click (but ignore if toggle was the click target)
-            wrapper.addEventListener('click', (ev) => {
-                // if toggle button was clicked, ignore here (it handles its own click)
-                if (ev.target === toggle || toggle.contains(ev.target)) return;
-                const src = img.getAttribute('src') || img.src;
-                const caption = img.getAttribute('alt') || '';
-                openModal(src, caption);
-            });
-
-            // toggle containment when fit button clicked
-            toggle.addEventListener('click', (ev) => {
-                ev.stopPropagation(); // don't open modal
-                // switch class
-                if (card.classList.contains('contain')) {
-                    card.classList.remove('contain');
-                    toggle.textContent = '↔';
-                    toggle.title = 'Show full bleed (cover)';
-                } else {
-                    card.classList.add('contain');
-                    toggle.textContent = '⤢';
-                    toggle.title = 'Fit image inside box (contain)';
-                }
-            });
-
-            // keyboard accessibility for toggle
-            toggle.addEventListener('keydown', (ev) => {
-                if (ev.key === 'Enter' || ev.key === ' ') {
-                    ev.preventDefault();
-                    toggle.click();
-                }
-            });
+      }
+    
+      // new vote handler: prevents double voting in browser and uses server
+      async function vote(section, type) {
+        // local guard
+        if (hasVotedLocal(section)) {
+          alert('You already voted for this section in this browser.');
+          return;
+        }
+    
+        // optimistic UI feedback
+        disableVoteButtons(section, true);
+    
+        const result = await sendVoteToServer(section, type);
+        if (!result) {
+          alert('Server error. Try again later.');
+          disableVoteButtons(section, false);
+          return;
+        }
+    
+        if (result.success) {
+          // server appended; update UI with authoritative counts
+          markVotedLocal(section);
+          updateDisplay(section, result.counts || {});
+        } else if (result.error === 'already_voted') {
+          // server found this voter id has already voted (maybe localStorage reset)
+          markVotedLocal(section);
+          updateDisplay(section, result.counts || {});
+          alert('Our server records show this browser already voted for this section.');
+        } else {
+          // Other error
+          alert('Vote failed: ' + (result.error || 'unknown'));
+          disableVoteButtons(section, false);
+        }
+      }
+    
+      // initialize UI state on load
+      window.addEventListener('DOMContentLoaded', async () => {
+        // create voter id if missing
+        getVoterId();
+        // set button disabled state for sections user already voted in this browser
+        [1,2,3].forEach(s => {
+          if (hasVotedLocal(s)) disableVoteButtons(s, true);
         });
-
-        // Close modal on Escape key
-        window.addEventListener('keydown', (ev) => {
-            if (ev.key === 'Escape') {
-                const modal = document.getElementById('modal');
-                if (modal.classList.contains('open')) {
-                    closeModal({ target: modal });
-                }
-            }
-        });
-
-        // If image fails to load, keep original placeholder logic
-        document.querySelectorAll('.photo-card img').forEach(img => {
-            img.addEventListener('error', () => {
-                const placeholder = '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="48%" fill="#64748b" font-size="28" text-anchor="middle">Missing image</text><text x="50%" y="58%" fill="#94a3b8" font-size="20" text-anchor="middle">Upload PhotoX.png to the repo</text></svg>';
-                img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(placeholder);
-            });
-        });
-
-        // preserve editable text across reloads (unchanged)
-        function restoreText(id){
-            const el = document.getElementById(id);
-            if(!el) return;
-            const key = 'text_' + id;
-            const saved = localStorage.getItem(key);
-            if(saved) el.innerText = saved;
-            el.addEventListener('input', () => localStorage.setItem(key, el.innerText));
-        }
-        // (no editable text ids exist in this version; function kept to avoid changing other logic)
+        // fetch authoritative counts from server
+        await fetchCountsFromServer();
+      });
+    
+      // Note: the rest of your existing script (modal, progress bar, etc.) can remain unchanged.
     </script>
 </body>
 </html>
