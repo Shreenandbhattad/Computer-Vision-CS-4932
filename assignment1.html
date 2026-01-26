@@ -200,8 +200,16 @@
         .photo-card img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
+            object-fit: cover; /* default: crop to fill */
+            transition: transform 0.4s ease, object-fit 0.2s ease;
+            display: block;
+            background: #f3f4f6;
+        }
+
+        /* when card has .contain the image fits inside the box fully */
+        .photo-card.contain img {
+            object-fit: contain;
+            background: #111; /* subtle letterbox background to show edges */
         }
 
         .photo-card:hover img {
@@ -239,6 +247,24 @@
             color: var(--muted);
             line-height: 1.5;
         }
+
+        /* Fit toggle button (top-right of image) */
+        .fit-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+        .fit-toggle:hover { background: white; box-shadow: 0 6px 14px rgba(0,0,0,0.06); }
 
         /* Explanation Box */
         .explanation {
@@ -355,6 +381,58 @@
             margin: 4px 0;
         }
 
+        /* Modal */
+        .modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(3,7,12,0.75);
+            z-index: 2000;
+            padding: 20px;
+        }
+        .modal.open { display:flex; }
+        .modal-content {
+            max-width: 96%;
+            max-height: 92%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .modal img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 30px 80px rgba(2,6,23,0.8);
+        }
+        .modal-close {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid var(--border);
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 2100;
+            font-weight: 700;
+        }
+        .modal-caption {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 14px;
+            background: rgba(0,0,0,0.35);
+            padding: 8px 12px;
+            border-radius: 8px;
+            z-index: 2100;
+            backdrop-filter: blur(6px);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -428,6 +506,7 @@
                 <div class="photo-card">
                     <div class="photo-wrapper">
                         <div class="photo-label">Photo A</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
                         <img src="Photo1.png" alt="Close-up portrait">
                     </div>
                     <div class="photo-info">
@@ -439,6 +518,7 @@
                 <div class="photo-card">
                     <div class="photo-wrapper">
                         <div class="photo-label">Photo B</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
                         <img src="Photo2.png" alt="Stepped-back portrait">
                     </div>
                     <div class="photo-info">
@@ -478,6 +558,7 @@
                 <div class="photo-card">
                     <div class="photo-wrapper">
                         <div class="photo-label">Photo C</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
                         <img src="photo3.png" alt="Street zoomed from distance">
                     </div>
                     <div class="photo-info">
@@ -489,6 +570,7 @@
                 <div class="photo-card">
                     <div class="photo-wrapper">
                         <div class="photo-label">Photo D</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
                         <img src="Photo4.png" alt="Street from closer position">
                     </div>
                     <div class="photo-info">
@@ -528,6 +610,7 @@
                 <div class="photo-card">
                     <div class="photo-wrapper">
                         <div class="photo-label">Perspective</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
                         <img src="Photo5.png" alt="Perspective projection">
                     </div>
                     <div class="photo-info">
@@ -539,6 +622,7 @@
                 <div class="photo-card">
                     <div class="photo-wrapper">
                         <div class="photo-label">Orthographic</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
                         <img src="Photo6.png" alt="Orthographic projection">
                     </div>
                     <div class="photo-info">
@@ -571,6 +655,15 @@
         <p>CS-4912: Computer Vision • Spring 2026</p>
         <p>Professor Raghavendra Singh</p>
     </footer>
+
+    <!-- Modal element (shared for all images) -->
+    <div id="modal" class="modal" onclick="closeModal(event)">
+        <button class="modal-close" aria-label="Close" onclick="closeModal(event)">✕</button>
+        <div class="modal-content">
+            <img id="modalImg" src="" alt="expanded">
+        </div>
+        <div id="modalCaption" class="modal-caption" aria-hidden="true"></div>
+    </div>
 
     <script>
         window.addEventListener('scroll', () => {
@@ -614,6 +707,97 @@
         }
 
         [1, 2, 3].forEach(updateDisplay);
+
+        /* === New: modal open and fit-toggle behavior === */
+
+        // Open modal with clicked image, set caption from alt text if present
+        function openModal(imgSrc, caption) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modalImg');
+            const modalCaption = document.getElementById('modalCaption');
+            modalImg.src = imgSrc;
+            modalCaption.textContent = caption || '';
+            modal.classList.add('open');
+        }
+
+        function closeModal(e) {
+            // if click was on the close button or outside the image area
+            if (e && e.target && (e.target.classList.contains('modal') || e.target.classList.contains('modal-close'))) {
+                const modal = document.getElementById('modal');
+                modal.classList.remove('open');
+                document.getElementById('modalImg').src = '';
+                document.getElementById('modalCaption').textContent = '';
+            }
+        }
+
+        // Attach listeners: clicking the photo-wrapper opens modal,
+        // clicking the fit-toggle button toggles between cover/contain
+        document.querySelectorAll('.photo-card').forEach(card => {
+            const wrapper = card.querySelector('.photo-wrapper');
+            const img = card.querySelector('img');
+            const toggle = card.querySelector('.fit-toggle');
+
+            // open modal on wrapper click (but ignore if toggle was the click target)
+            wrapper.addEventListener('click', (ev) => {
+                // if toggle button was clicked, ignore here (it handles its own click)
+                if (ev.target === toggle || toggle.contains(ev.target)) return;
+                const src = img.getAttribute('src') || img.src;
+                const caption = img.getAttribute('alt') || '';
+                openModal(src, caption);
+            });
+
+            // toggle containment when fit button clicked
+            toggle.addEventListener('click', (ev) => {
+                ev.stopPropagation(); // don't open modal
+                // switch class
+                if (card.classList.contains('contain')) {
+                    card.classList.remove('contain');
+                    toggle.textContent = '↔';
+                    toggle.title = 'Show full bleed (cover)';
+                } else {
+                    card.classList.add('contain');
+                    toggle.textContent = '⤢';
+                    toggle.title = 'Fit image inside box (contain)';
+                }
+            });
+
+            // keyboard accessibility for toggle
+            toggle.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    toggle.click();
+                }
+            });
+        });
+
+        // Close modal on Escape key
+        window.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Escape') {
+                const modal = document.getElementById('modal');
+                if (modal.classList.contains('open')) {
+                    closeModal({ target: modal });
+                }
+            }
+        });
+
+        // If image fails to load, keep original placeholder logic
+        document.querySelectorAll('.photo-card img').forEach(img => {
+            img.addEventListener('error', () => {
+                const placeholder = '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="48%" fill="#64748b" font-size="28" text-anchor="middle">Missing image</text><text x="50%" y="58%" fill="#94a3b8" font-size="20" text-anchor="middle">Upload PhotoX.png to the repo</text></svg>';
+                img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(placeholder);
+            });
+        });
+
+        // preserve editable text across reloads (unchanged)
+        function restoreText(id){
+            const el = document.getElementById(id);
+            if(!el) return;
+            const key = 'text_' + id;
+            const saved = localStorage.getItem(key);
+            if(saved) el.innerText = saved;
+            el.addEventListener('input', () => localStorage.setItem(key, el.innerText));
+        }
+        // (no editable text ids exist in this version; function kept to avoid changing other logic)
     </script>
 </body>
 </html>
