@@ -355,6 +355,9 @@
             color: white;
         }
 
+        /* disable style for buttons when already voted */
+        .vote-btn[disabled] { opacity: 0.6; cursor: not-allowed; transform: none; }
+
         .vote-count {
             background: white;
             border: 1.5px solid var(--accent);
@@ -684,26 +687,65 @@
             observer.observe(section);
         });
 
+        // Votes stored per section
         const votes = {
             1: parseInt(localStorage.getItem('votes-1') || '0'),
             2: parseInt(localStorage.getItem('votes-2') || '0'),
             3: parseInt(localStorage.getItem('votes-3') || '0')
         };
 
+        // Per-browser voted flag per section: null | 'up' | 'down'
+        const voted = {
+            1: localStorage.getItem('voted-1') || null,
+            2: localStorage.getItem('voted-2') || null,
+            3: localStorage.getItem('voted-3') || null
+        };
+
         function updateDisplay(section) {
             const count = votes[section];
             const text = count === 1 ? 'vote' : 'votes';
             document.getElementById(`votes-${section}`).textContent = `${count} ${text}`;
+
+            // disable buttons if already voted in this browser
+            const sectionElem = document.querySelector(`.section[data-section="${section}"]`);
+            if (sectionElem) {
+                const upBtn = sectionElem.querySelector('.vote-btn.upvote');
+                const downBtn = sectionElem.querySelector('.vote-btn.downvote');
+                if (voted[section]) {
+                    upBtn.disabled = true;
+                    downBtn.disabled = true;
+                } else {
+                    upBtn.disabled = false;
+                    downBtn.disabled = false;
+                }
+            }
         }
 
         function vote(section, type) {
+            // Only allow one vote per browser per section
+            if (voted[section]) {
+                alert('You already voted in this browser for this section.');
+                return;
+            }
+
+            // update counts
             votes[section] += (type === 'up' ? 1 : -1);
+            // save totals and voted flag
             localStorage.setItem(`votes-${section}`, votes[section].toString());
+            voted[section] = type;
+            localStorage.setItem(`voted-${section}`, type);
+
             updateDisplay(section);
-            
-            const btn = event.target.closest('.vote-btn');
-            btn.style.transform = 'scale(0.95)';
-            setTimeout(() => btn.style.transform = '', 150);
+
+            // animate the clicked button visually
+            const sectionElem = document.querySelector(`.section[data-section="${section}"]`);
+            if (sectionElem) {
+                const btn = sectionElem.querySelector(`.vote-btn.${type === 'up' ? 'upvote' : 'downvote'}`);
+                if (btn) {
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => btn.style.transform = '', 150);
+                }
+            }
         }
 
         [1, 2, 3].forEach(updateDisplay);
