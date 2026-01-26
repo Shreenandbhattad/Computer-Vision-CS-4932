@@ -355,9 +355,6 @@
             color: white;
         }
 
-        /* disable style for buttons when already voted */
-        .vote-btn[disabled] { opacity: 0.6; cursor: not-allowed; transform: none; }
-
         .vote-count {
             background: white;
             border: 1.5px solid var(--accent);
@@ -669,133 +666,213 @@
     </div>
 
     <script>
-      // --- CONFIG: set this to your deployed Apps Script web app URL ---
-      const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxH8V_aAe8dlbzHBJlzDAviXmpuupKCQu_YI3_T2BpM3CYcy-_3ma74f-QSAML9yBfh4g/exec'; // <-- replace
-    
-      // helper: generate a stable voter id stored in localStorage
-      function getVoterId() {
-        let id = localStorage.getItem('cv_voter_id');
-        if (!id) {
-          // simple UUID v4
-          id = 'v_' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-          );
-          localStorage.setItem('cv_voter_id', id);
-        }
-        return id;
-      }
-    
-      // update UI vote counts
-      function updateDisplay(section, counts) {
-        const count = (counts && counts[String(section)]) ? counts[String(section)] : 0;
-        const text = Math.abs(count) === 1 ? 'vote' : 'votes';
-        const el = document.getElementById(`votes-${section}`);
-        if (el) el.textContent = `${count} ${text}`;
-      }
-    
-      // fetch counts from server (GET)
-      async function fetchCountsFromServer() {
-        try {
-          const res = await fetch(WEBAPP_URL);
-          const j = await res.json();
-          if (j && j.success && j.counts) {
-            updateDisplay(1, j.counts);
-            updateDisplay(2, j.counts);
-            updateDisplay(3, j.counts);
-          }
-        } catch (err) {
-          console.warn('Could not fetch counts:', err);
-        }
-      }
-    
-      // client-side guard: mark voted sections in localStorage and disable buttons
-      function markVotedLocal(section) {
-        localStorage.setItem(`voted_section_${section}`, '1');
-        disableVoteButtons(section, true);
-      }
-      function hasVotedLocal(section) {
-        return localStorage.getItem(`voted_section_${section}`) === '1';
-      }
-      function disableVoteButtons(section, disable) {
-        const sectionEl = document.querySelector(`.section[data-section="${section}"]`);
-        if (!sectionEl) return;
-        const up = sectionEl.querySelector('.vote-btn.upvote');
-        const down = sectionEl.querySelector('.vote-btn.downvote');
-        if (up) up.disabled = disable;
-        if (down) down.disabled = disable;
-        if (disable) {
-          if (up) up.style.opacity = 0.6;
-          if (down) down.style.opacity = 0.6;
-        } else {
-          if (up) up.style.opacity = 1;
-          if (down) down.style.opacity = 1;
-        }
-      }
-    
-      // send vote to server via POST
-      async function sendVoteToServer(section, type) {
-        const voterId = getVoterId();
-        try {
-          const resp = await fetch(WEBAPP_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ voter_id: voterId, section: String(section), type: type })
-          });
-          const j = await resp.json();
-          return j;
-        } catch (err) {
-          console.error('Vote request failed', err);
-          return { success: false, error: 'network' };
-        }
-      }
-    
-      // new vote handler: prevents double voting in browser and uses server
-      async function vote(section, type) {
-        // local guard
-        if (hasVotedLocal(section)) {
-          alert('You already voted for this section in this browser.');
-          return;
-        }
-    
-        // optimistic UI feedback
-        disableVoteButtons(section, true);
-    
-        const result = await sendVoteToServer(section, type);
-        if (!result) {
-          alert('Server error. Try again later.');
-          disableVoteButtons(section, false);
-          return;
-        }
-    
-        if (result.success) {
-          // server appended; update UI with authoritative counts
-          markVotedLocal(section);
-          updateDisplay(section, result.counts || {});
-        } else if (result.error === 'already_voted') {
-          // server found this voter id has already voted (maybe localStorage reset)
-          markVotedLocal(section);
-          updateDisplay(section, result.counts || {});
-          alert('Our server records show this browser already voted for this section.');
-        } else {
-          // Other error
-          alert('Vote failed: ' + (result.error || 'unknown'));
-          disableVoteButtons(section, false);
-        }
-      }
-    
-      // initialize UI state on load
-      window.addEventListener('DOMContentLoaded', async () => {
-        // create voter id if missing
-        getVoterId();
-        // set button disabled state for sections user already voted in this browser
-        [1,2,3].forEach(s => {
-          if (hasVotedLocal(s)) disableVoteButtons(s, true);
+        window.addEventListener('scroll', () => {
+            const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = window.scrollY;
+            document.getElementById('progressBar').style.width = (scrolled / scrollable * 100) + '%';
         });
-        // fetch authoritative counts from server
-        await fetchCountsFromServer();
-      });
-    
-      // Note: the rest of your existing script (modal, progress bar, etc.) can remain unchanged.
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        /* ===== VOTING: server-backed via Google Apps Script =====
+           Replace WEBAPP_URL with your deployed Apps Script web app URL.
+           The Apps Script should implement doGet (returns counts) and doPost (accepts {voter_id, section, type}).
+        */
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxH8V_aAe8dlbzHBJlzDAviXmpuupKCQu_YI3_T2BpM3CYcy-_3ma74f-QSAML9yBfh4g/exec'; // <-- replace with your web app URL
+
+        // generate / retrieve stable voter id for this browser
+        function getVoterId() {
+            let id = localStorage.getItem('cv_voter_id');
+            if (!id) {
+                id = 'v_' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+                );
+                localStorage.setItem('cv_voter_id', id);
+            }
+            return id;
+        }
+
+        function updateDisplay(section, counts) {
+            const count = (counts && counts[String(section)]) ? counts[String(section)] : 0;
+            const text = Math.abs(count) === 1 ? 'vote' : 'votes';
+            const el = document.getElementById(`votes-${section}`);
+            if (el) el.textContent = `${count} ${text}`;
+        }
+
+        async function fetchCountsFromServer() {
+            try {
+                const res = await fetch(WEBAPP_URL);
+                const j = await res.json();
+                if (j && j.success && j.counts) {
+                    updateDisplay(1, j.counts);
+                    updateDisplay(2, j.counts);
+                    updateDisplay(3, j.counts);
+                }
+            } catch (err) {
+                console.warn('Could not fetch counts:', err);
+            }
+        }
+
+        function markVotedLocal(section) {
+            localStorage.setItem(`voted_section_${section}`, '1');
+            disableVoteButtons(section, true);
+        }
+        function hasVotedLocal(section) {
+            return localStorage.getItem(`voted_section_${section}`) === '1';
+        }
+        function disableVoteButtons(section, disable) {
+            const sectionEl = document.querySelector(`.section[data-section="${section}"]`);
+            if (!sectionEl) return;
+            const up = sectionEl.querySelector('.vote-btn.upvote');
+            const down = sectionEl.querySelector('.vote-btn.downvote');
+            if (up) up.disabled = disable;
+            if (down) down.disabled = disable;
+            if (disable) {
+                if (up) up.style.opacity = 0.6;
+                if (down) down.style.opacity = 0.6;
+            } else {
+                if (up) up.style.opacity = 1;
+                if (down) down.style.opacity = 1;
+            }
+        }
+
+        async function sendVoteToServer(section, type) {
+            const voterId = getVoterId();
+            try {
+                const resp = await fetch(WEBAPP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ voter_id: voterId, section: String(section), type: type })
+                });
+                const j = await resp.json();
+                return j;
+            } catch (err) {
+                console.error('Vote request failed', err);
+                return { success: false, error: 'network' };
+            }
+        }
+
+        // new vote handler (called by buttons)
+        async function vote(section, type) {
+            // local guard
+            if (hasVotedLocal(section)) {
+                alert('You already voted for this section in this browser.');
+                return;
+            }
+
+            // optimistic UI: disable buttons while request is in flight
+            disableVoteButtons(section, true);
+
+            const result = await sendVoteToServer(section, type);
+            if (!result) {
+                alert('Server error. Try again later.');
+                disableVoteButtons(section, false);
+                return;
+            }
+
+            if (result.success) {
+                markVotedLocal(section);
+                updateDisplay(section, result.counts || {});
+            } else if (result.error === 'already_voted') {
+                // server indicates this voter already voted
+                markVotedLocal(section);
+                updateDisplay(section, result.counts || {});
+                alert('Our server records show this browser already voted for this section.');
+            } else {
+                alert('Vote failed: ' + (result.error || 'unknown'));
+                disableVoteButtons(section, false);
+            }
+        }
+
+        // initialize button state and fetch counts
+        window.addEventListener('DOMContentLoaded', async () => {
+            getVoterId(); // ensure an id exists
+            [1,2,3].forEach(s => {
+                if (hasVotedLocal(s)) disableVoteButtons(s, true);
+            });
+            await fetchCountsFromServer();
+        });
+
+        /* === New: modal open and fit-toggle behavior (unchanged) === */
+
+        function openModal(imgSrc, caption) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modalImg');
+            const modalCaption = document.getElementById('modalCaption');
+            modalImg.src = imgSrc;
+            modalCaption.textContent = caption || '';
+            modal.classList.add('open');
+        }
+
+        function closeModal(e) {
+            if (e && e.target && (e.target.classList.contains('modal') || e.target.classList.contains('modal-close'))) {
+                const modal = document.getElementById('modal');
+                modal.classList.remove('open');
+                document.getElementById('modalImg').src = '';
+                document.getElementById('modalCaption').textContent = '';
+            }
+        }
+
+        document.querySelectorAll('.photo-card').forEach(card => {
+            const wrapper = card.querySelector('.photo-wrapper');
+            const img = card.querySelector('img');
+            const toggle = card.querySelector('.fit-toggle');
+
+            wrapper.addEventListener('click', (ev) => {
+                if (ev.target === toggle || toggle.contains(ev.target)) return;
+                const src = img.getAttribute('src') || img.src;
+                const caption = img.getAttribute('alt') || '';
+                openModal(src, caption);
+            });
+
+            toggle.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                if (card.classList.contains('contain')) {
+                    card.classList.remove('contain');
+                    toggle.textContent = '↔';
+                    toggle.title = 'Show full bleed (cover)';
+                } else {
+                    card.classList.add('contain');
+                    toggle.textContent = '⤢';
+                    toggle.title = 'Fit image inside box (contain)';
+                }
+            });
+
+            toggle.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    toggle.click();
+                }
+            });
+        });
+
+        window.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Escape') {
+                const modal = document.getElementById('modal');
+                if (modal.classList.contains('open')) {
+                    closeModal({ target: modal });
+                }
+            }
+        });
+
+        // image error fallback
+        document.querySelectorAll('.photo-card img').forEach(img => {
+            img.addEventListener('error', () => {
+                const placeholder = '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="48%" fill="#64748b" font-size="28" text-anchor="middle">Missing image</text><text x="50%" y="58%" fill="#94a3b8" font-size="20" text-anchor="middle">Upload PhotoX.png to the repo</text></svg>';
+                img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(placeholder);
+            });
+        });
+
     </script>
 </body>
 </html>
