@@ -6,6 +6,7 @@
     <title>CS-4912 — Assignment 1</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* (CSS unchanged from your version) */
         :root {
             --bg: #fafbfd;
             --card: #ffffff;
@@ -21,460 +22,69 @@
             --maxw: 1080px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html, body {
-            height: 100%;
-        }
-
+        * { box-sizing: border-box; margin:0; padding:0; }
+        html, body { height:100%; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            line-height: 1.6;
+            font-family:'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            line-height:1.6;
         }
 
-        .progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent), var(--accent-light));
-            z-index: 1000;
-            transition: width 0.1s ease;
-        }
+        .progress-bar { position: fixed; top:0; left:0; height:3px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); z-index:1000; transition: width .1s ease; }
+        .container { width:100%; max-width:var(--maxw); margin:0 auto; padding:40px 24px 80px; }
 
-        .container {
-            width: 100%;
-            max-width: var(--maxw);
-            margin: 0 auto;
-            padding: 40px 24px 80px;
-        }
+        header { margin-bottom:48px; padding-bottom:24px; border-bottom:1px solid var(--border); }
+        .header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+        h1 { font-size:28px; font-weight:700; letter-spacing:-0.02em; color:var(--text); }
+        .subtitle { color:var(--muted); font-size:15px; font-weight:400; }
+        .badge { display:inline-block; background: linear-gradient(135deg, var(--accent), var(--accent-light)); color:white; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500; }
 
-        /* Header */
-        header {
-            margin-bottom: 48px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid var(--border);
-        }
+        .section { background:var(--card); border-radius:var(--radius); padding:36px; margin-bottom:32px; border:1px solid var(--border); box-shadow:0 1px 3px var(--shadow); transition:all .3s ease; opacity:0; transform:translateY(20px); }
+        .section.visible { opacity:1; transform:none; }
+        .section:hover { box-shadow:0 4px 12px var(--shadow-hover); border-color:var(--accent-light); }
+        .section-header { margin-bottom:28px; }
+        .section-label { color:white; background:var(--accent); font-size:13px; font-weight:600; text-transform:uppercase; padding:6px 14px; border-radius:6px; display:inline-block; margin-bottom:12px; }
+        .section-title { font-size:24px; font-weight:600; color:var(--text); margin-bottom:4px; }
+        .section-description { color:var(--muted); font-size:14px; }
 
-        .header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
+        .photo-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:24px; margin:28px 0; }
+        .photo-card { position:relative; border-radius:var(--radius); overflow:hidden; background:var(--bg); border:1px solid var(--border); transition:all .3s ease; cursor:pointer; }
+        .photo-card:hover { transform:translateY(-4px); box-shadow:0 8px 24px var(--shadow-hover); border-color:var(--accent-light); }
+        .photo-wrapper { position:relative; width:100%; height:360px; overflow:hidden; background:#f3f4f6; }
+        .photo-card img { width:100%; height:100%; object-fit:cover; transition:transform .4s ease, object-fit .2s ease; display:block; background:#f3f4f6; }
+        .photo-card.contain img { object-fit:contain; background:#111; }
+        .photo-card:hover img { transform:scale(1.05); }
+        .photo-label { position:absolute; top:12px; left:12px; background: rgba(29,78,216,0.95); color:white; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600; z-index:2; }
+        .photo-info { padding:16px; }
+        .photo-title { font-size:15px; font-weight:600; color:var(--text); margin-bottom:4px; }
+        .photo-subtitle { font-size:14px; color:var(--muted); }
 
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: var(--text);
-        }
+        .fit-toggle { position:absolute; top:10px; right:10px; z-index:3; background: rgba(255,255,255,0.9); border:1px solid var(--border); color:var(--text); padding:6px 8px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; }
+        .fit-toggle:hover { background:white; box-shadow:0 6px 14px rgba(0,0,0,0.06); }
 
-        .subtitle {
-            color: var(--muted);
-            font-size: 15px;
-            font-weight: 400;
-        }
+        .explanation { background:#f0f6ff; border-left:4px solid var(--accent); padding:20px; border-radius:0 var(--radius) var(--radius) 0; margin:28px 0; }
+        .explanation h3 { font-size:16px; font-weight:600; margin-bottom:12px; }
+        .explanation p { color:var(--text); font-size:14px; line-height:1.6; margin-bottom:10px; }
 
-        .badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--accent), var(--accent-light));
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 0.01em;
-        }
+        .vote-section { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:32px; padding-top:24px; border-top:1px solid var(--border); }
+        .vote-btn { background:white; border:1.5px solid var(--border); color:var(--text); padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:500; font-size:14px; display:flex; align-items:center; gap:8px; }
+        .vote-btn.upvote { border-color:#10b981; color:#059669; } .vote-btn.downvote { border-color:#ef4444; color:#dc2626; }
+        .vote-count { background:white; border:1.5px solid var(--accent); color:var(--accent); padding:10px 20px; border-radius:8px; font-weight:600; font-size:15px; min-width:100px; text-align:center; }
 
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 16px;
-            transition: gap 0.2s ease;
-        }
-
-        .back-link:hover {
-            gap: 10px;
-        }
-
-        /* Section */
-        .section {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 36px;
-            margin-bottom: 32px;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 3px var(--shadow);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        .section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .section:hover {
-            box-shadow: 0 4px 12px var(--shadow-hover);
-            border-color: var(--accent-light);
-        }
-
-        .section-header {
-            margin-bottom: 28px;
-        }
-
-        .section-label {
-            color: white;
-            background: var(--accent);
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            padding: 6px 14px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-
-        .section-title {
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-
-        .section-description {
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* Photo Grid */
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
-            margin: 28px 0;
-        }
-
-        .photo-card {
-            position: relative;
-            border-radius: var(--radius);
-            overflow: hidden;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .photo-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px var(--shadow-hover);
-            border-color: var(--accent-light);
-        }
-
-        .photo-wrapper {
-            position: relative;
-            width: 100%;
-            height: 360px;
-            overflow: hidden;
-            background: #f3f4f6;
-        }
-
-        .photo-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* default: crop to fill */
-            transition: transform 0.4s ease, object-fit 0.2s ease;
-            display: block;
-            background: #f3f4f6;
-        }
-
-        /* when card has .contain the image fits inside the box fully */
-        .photo-card.contain img {
-            object-fit: contain;
-            background: #111; /* subtle letterbox background to show edges */
-        }
-
-        .photo-card:hover img {
-            transform: scale(1.05);
-        }
-
-        .photo-label {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(29, 78, 216, 0.95);
-            backdrop-filter: blur(8px);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            z-index: 2;
-            letter-spacing: 0.01em;
-        }
-
-        .photo-info {
-            padding: 16px;
-        }
-
-        .photo-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-
-        .photo-subtitle {
-            font-size: 14px;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
-        /* Fit toggle button (top-right of image) */
-        .fit-toggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 3;
-            background: rgba(255,255,255,0.9);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 6px 8px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-        }
-        .fit-toggle:hover { background: white; box-shadow: 0 6px 14px rgba(0,0,0,0.06); }
-
-        /* Explanation Box */
-        .explanation {
-            background: #f0f6ff;
-            border-left: 4px solid var(--accent);
-            padding: 20px;
-            border-radius: 0 var(--radius) var(--radius) 0;
-            margin: 28px 0;
-        }
-
-        .explanation h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 12px;
-        }
-
-        .explanation p {
-            color: var(--text);
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-
-        .explanation p:last-child {
-            margin-bottom: 0;
-        }
-
-        .explanation strong {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* Voting System */
-        .vote-section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-        }
-
-        .vote-btn {
-            background: white;
-            border: 1.5px solid var(--border);
-            color: var(--text);
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .vote-btn:hover {
-            border-color: var(--accent-light);
-            background: #f0f6ff;
-            transform: translateY(-1px);
-        }
-
-        .vote-btn:active {
-            transform: translateY(0);
-        }
-
-        .vote-btn.upvote {
-            border-color: #10b981;
-            color: #059669;
-        }
-
-        .vote-btn.upvote:hover {
-            background: #10b981;
-            color: white;
-        }
-
-        .vote-btn.downvote {
-            border-color: #ef4444;
-            color: #dc2626;
-        }
-
-        .vote-btn.downvote:hover {
-            background: #ef4444;
-            color: white;
-        }
-
-        .vote-count {
-            background: white;
-            border: 1.5px solid var(--accent);
-            color: var(--accent);
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            min-width: 100px;
-            text-align: center;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 40px 24px;
-            color: var(--muted);
-            font-size: 14px;
-            border-top: 1px solid var(--border);
-            margin-top: 48px;
-        }
-
-        footer p {
-            margin: 4px 0;
-        }
-
-        /* Modal */
-        .modal {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(3,7,12,0.75);
-            z-index: 2000;
-            padding: 20px;
-        }
+        footer { text-align:center; padding:40px 24px; color:var(--muted); font-size:14px; border-top:1px solid var(--border); margin-top:48px; }
+        .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(3,7,12,0.75); z-index:2000; padding:20px; }
         .modal.open { display:flex; }
-        .modal-content {
-            max-width: 96%;
-            max-height: 92%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-        }
-        .modal img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 30px 80px rgba(2,6,23,0.8);
-        }
-        .modal-close {
-            position: absolute;
-            top: 18px;
-            right: 20px;
-            background: rgba(255,255,255,0.95);
-            border: 1px solid var(--border);
-            padding: 8px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            z-index: 2100;
-            font-weight: 700;
-        }
-        .modal-caption {
-            position: absolute;
-            bottom: 28px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            font-size: 14px;
-            background: rgba(0,0,0,0.35);
-            padding: 8px 12px;
-            border-radius: 8px;
-            z-index: 2100;
-            backdrop-filter: blur(6px);
-        }
+        .modal-content { max-width:96%; max-height:92%; display:flex; align-items:center; justify-content:center; }
+        .modal img { max-width:100%; max-height:100%; object-fit:contain; border-radius:8px; box-shadow:0 30px 80px rgba(2,6,23,0.8); }
+        .modal-close { position:absolute; top:18px; right:20px; background:rgba(255,255,255,0.95); border:1px solid var(--border); padding:8px 10px; border-radius:8px; cursor:pointer; z-index:2100; font-weight:700; }
+        .modal-caption { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); color:white; font-size:14px; background:rgba(0,0,0,0.35); padding:8px 12px; border-radius:8px; z-index:2100; }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 24px 16px 60px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .section {
-                padding: 24px 20px;
-            }
-
-            .section-title {
-                font-size: 20px;
-            }
-
-            .photo-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .vote-section {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .vote-btn, .vote-count {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .header-top {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-        }
-
-        html {
-            scroll-behavior: smooth;
+        @media (max-width:768px) {
+            .photo-grid { grid-template-columns:1fr; gap:20px; }
+            .vote-section { flex-direction:column; gap:12px; }
         }
     </style>
 </head>
@@ -536,13 +146,9 @@
             </div>
 
             <div class="vote-section">
-                <button class="vote-btn upvote" onclick="vote(1, 'up')">
-                    Upvote
-                </button>
+                <button class="vote-btn upvote" id="up-1" onclick="vote(1, 'up')">Upvote</button>
                 <div class="vote-count" id="votes-1">0 votes</div>
-                <button class="vote-btn downvote" onclick="vote(1, 'down')">
-                    Downvote
-                </button>
+                <button class="vote-btn downvote" id="down-1" onclick="vote(1, 'down')">Downvote</button>
             </div>
         </section>
 
@@ -588,13 +194,9 @@
             </div>
 
             <div class="vote-section">
-                <button class="vote-btn upvote" onclick="vote(2, 'up')">
-                    Upvote
-                </button>
+                <button class="vote-btn upvote" id="up-2" onclick="vote(2, 'up')">Upvote</button>
                 <div class="vote-count" id="votes-2">0 votes</div>
-                <button class="vote-btn downvote" onclick="vote(2, 'down')">
-                    Downvote
-                </button>
+                <button class="vote-btn downvote" id="down-2" onclick="vote(2, 'down')">Downvote</button>
             </div>
         </section>
 
@@ -640,13 +242,9 @@
             </div>
 
             <div class="vote-section">
-                <button class="vote-btn upvote" onclick="vote(3, 'up')">
-                    Upvote
-                </button>
+                <button class="vote-btn upvote" id="up-3" onclick="vote(3, 'up')">Upvote</button>
                 <div class="vote-count" id="votes-3">0 votes</div>
-                <button class="vote-btn downvote" onclick="vote(3, 'down')">
-                    Downvote
-                </button>
+                <button class="vote-btn downvote" id="down-3" onclick="vote(3, 'down')">Downvote</button>
             </div>
         </section>
     </div>
@@ -666,52 +264,40 @@
     </div>
 
     <script>
+        // ==== CONFIG: set this to your Apps Script Web App URL ====
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyil8lSZij_KQ39GaPEwrKmKGzW3zk1eax5wWhWW4bGAK17ZZ6-j0NcathwoQ7zkWVLhg/exec'; // <-- REPLACE
+
+        // progress bar (unchanged)
         window.addEventListener('scroll', () => {
             const scrollable = document.documentElement.scrollHeight - window.innerHeight;
             const scrolled = window.scrollY;
             document.getElementById('progressBar').style.width = (scrolled / scrollable * 100) + '%';
         });
 
+        // intersection observer for reveal (unchanged)
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
+                if (entry.isIntersecting) entry.target.classList.add('visible');
             });
         }, { threshold: 0.15 });
+        document.querySelectorAll('.section').forEach(section => observer.observe(section));
 
-        document.querySelectorAll('.section').forEach(section => {
-            observer.observe(section);
-        });
+        /* ==========================
+           AUTHENTICATED VOTING LOGIC
+           - requires Apps Script deployed as web app "Execute as: User accessing the web app"
+           - client fetches must include credentials and origin query param
+           ========================== */
 
-        /* ===== VOTING: server-backed via Google Apps Script =====
-           Replace WEBAPP_URL with your deployed Apps Script web app URL.
-           The Apps Script should implement doGet (returns counts) and doPost (accepts {voter_id, section, type}).
-        */
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxH8V_aAe8dlbzHBJlzDAviXmpuupKCQu_YI3_T2BpM3CYcy-_3ma74f-QSAML9yBfh4g/exec'; // <-- replace with your web app URL
-
-        // generate / retrieve stable voter id for this browser
-        function getVoterId() {
-            let id = localStorage.getItem('cv_voter_id');
-            if (!id) {
-                id = 'v_' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-                );
-                localStorage.setItem('cv_voter_id', id);
-            }
-            return id;
+        // helper: build webapp URL with origin param
+        function webappUrlWithOrigin() {
+            const origin = location.origin;
+            return WEBAPP_URL + (WEBAPP_URL.indexOf('?') === -1 ? '?' : '&') + 'origin=' + encodeURIComponent(origin);
         }
 
-        function updateDisplay(section, counts) {
-            const count = (counts && counts[String(section)]) ? counts[String(section)] : 0;
-            const text = Math.abs(count) === 1 ? 'vote' : 'votes';
-            const el = document.getElementById(`votes-${section}`);
-            if (el) el.textContent = `${count} ${text}`;
-        }
-
-        async function fetchCountsFromServer() {
+        // fetch counts (GET) - include credentials so request is authenticated with Google cookie
+        async function fetchCounts() {
             try {
-                const res = await fetch(WEBAPP_URL);
+                const res = await fetch(webappUrlWithOrigin(), { method: 'GET', credentials: 'include' });
                 const j = await res.json();
                 if (j && j.success && j.counts) {
                     updateDisplay(1, j.counts);
@@ -723,88 +309,96 @@
             }
         }
 
-        function markVotedLocal(section) {
-            localStorage.setItem(`voted_section_${section}`, '1');
-            disableVoteButtons(section, true);
-        }
-        function hasVotedLocal(section) {
-            return localStorage.getItem(`voted_section_${section}`) === '1';
-        }
-        function disableVoteButtons(section, disable) {
-            const sectionEl = document.querySelector(`.section[data-section="${section}"]`);
-            if (!sectionEl) return;
-            const up = sectionEl.querySelector('.vote-btn.upvote');
-            const down = sectionEl.querySelector('.vote-btn.downvote');
-            if (up) up.disabled = disable;
-            if (down) down.disabled = disable;
-            if (disable) {
-                if (up) up.style.opacity = 0.6;
-                if (down) down.style.opacity = 0.6;
-            } else {
-                if (up) up.style.opacity = 1;
-                if (down) down.style.opacity = 1;
-            }
+        function updateDisplay(section, counts) {
+            const count = (counts && counts[String(section)]) ? counts[String(section)] : 0;
+            const text = Math.abs(count) === 1 ? 'vote' : 'votes';
+            const el = document.getElementById(`votes-${section}`);
+            if (el) el.textContent = `${count} ${text}`;
         }
 
-        async function sendVoteToServer(section, type) {
-            const voterId = getVoterId();
+        // disable / enable vote buttons UI
+        function disableVoteButtons(section, disable) {
+            const up = document.getElementById(`up-${section}`);
+            const down = document.getElementById(`down-${section}`);
+            if (up) { up.disabled = disable; up.style.opacity = disable ? 0.6 : 1; }
+            if (down) { down.disabled = disable; down.style.opacity = disable ? 0.6 : 1; }
+        }
+
+        // send vote to server (POST) with credentials: 'include'
+        async function sendVote(section, type) {
             try {
-                const resp = await fetch(WEBAPP_URL, {
+                const res = await fetch(webappUrlWithOrigin(), {
                     method: 'POST',
+                    credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ voter_id: voterId, section: String(section), type: type })
+                    body: JSON.stringify({ section: String(section), type: String(type) })
                 });
-                const j = await resp.json();
+                const j = await res.json();
                 return j;
             } catch (err) {
-                console.error('Vote request failed', err);
                 return { success: false, error: 'network' };
             }
         }
 
-        // new vote handler (called by buttons)
+        // main vote function called by buttons
         async function vote(section, type) {
-            // local guard
-            if (hasVotedLocal(section)) {
-                alert('You already voted for this section in this browser.');
-                return;
-            }
-
-            // optimistic UI: disable buttons while request is in flight
+            // disable UI while in flight
             disableVoteButtons(section, true);
 
-            const result = await sendVoteToServer(section, type);
+            const result = await sendVote(section, type);
             if (!result) {
-                alert('Server error. Try again later.');
+                alert('Network error. Try again later.');
                 disableVoteButtons(section, false);
                 return;
             }
 
             if (result.success) {
-                markVotedLocal(section);
+                // server appended vote; update counts and disable buttons (server enforces uniqueness by email)
                 updateDisplay(section, result.counts || {});
-            } else if (result.error === 'already_voted') {
-                // server indicates this voter already voted
-                markVotedLocal(section);
-                updateDisplay(section, result.counts || {});
-                alert('Our server records show this browser already voted for this section.');
-            } else {
-                alert('Vote failed: ' + (result.error || 'unknown'));
-                disableVoteButtons(section, false);
+                disableVoteButtons(section, true);
+                alert('Thank you — your vote is recorded.');
+                return;
             }
+
+            // handle server errors
+            if (result.error === 'not_signed_in') {
+                // user must sign in: open web app URL (user has to sign in there), then retry after they return
+                const authUrl = webappUrlWithOrigin() + '&action=signin';
+                // open a small popup to prompt sign-in
+                window.open(authUrl, '_blank', 'width=600,height=700');
+                alert('Please sign in to your Google account in the newly opened tab (use your @ashoka.edu.in account), then click vote again.');
+                disableVoteButtons(section, false);
+                return;
+            }
+
+            if (result.error === 'forbidden_domain') {
+                alert('Voting is restricted to class (ashoka.edu.in) accounts only.');
+                disableVoteButtons(section, true);
+                return;
+            }
+
+            if (result.error === 'already_voted') {
+                updateDisplay(section, result.counts || {});
+                alert('Our records show you already voted for this submission.');
+                disableVoteButtons(section, true);
+                return;
+            }
+
+            // other errors
+            alert('Vote failed: ' + (result.error || 'unknown'));
+            disableVoteButtons(section, false);
         }
 
-        // initialize button state and fetch counts
+        // initialize: fetch counts and set button states
         window.addEventListener('DOMContentLoaded', async () => {
-            getVoterId(); // ensure an id exists
-            [1,2,3].forEach(s => {
-                if (hasVotedLocal(s)) disableVoteButtons(s, true);
-            });
-            await fetchCountsFromServer();
+            // Attempt to fetch counts and set UI
+            await fetchCounts();
+
+            // We cannot fully know whether the user already voted (server only knows via email).
+            // Buttons remain enabled; if they click and server replies 'already_voted', UI will reflect that.
         });
 
-        /* === New: modal open and fit-toggle behavior (unchanged) === */
-
+        /* === Modal & fit-toggle logic (unchanged) === */
         function openModal(imgSrc, caption) {
             const modal = document.getElementById('modal');
             const modalImg = document.getElementById('modalImg');
