@@ -1,492 +1,431 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>CS-4912 — Assignment 1</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #fafbfd;
-            --card: #ffffff;
-            --text: #0f1419;
-            --muted: #536471;
-            --accent: #1d4ed8;
-            --accent-light: #3b82f6;
-            --border: #e5e7eb;
-            --shadow: rgba(0, 0, 0, 0.04);
-            --shadow-hover: rgba(29, 78, 216, 0.12);
-            --radius: 12px;
-            --maxw: 1080px;
-        }
-
-        * { box-sizing: border-box; margin:0; padding:0; }
-        html,body { height:100%; }
-        body{
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background:var(--bg);
-            color:var(--text);
-            -webkit-font-smoothing:antialiased;
-            -moz-osx-font-smoothing:grayscale;
-            line-height:1.6;
-        }
-
-        .progress-bar { position: fixed; top:0; left:0; height:3px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); z-index:1000; transition: width .1s ease; }
-
-        .container { width:100%; max-width:var(--maxw); margin:0 auto; padding:40px 24px 80px; }
-
-        header { margin-bottom:48px; padding-bottom:24px; border-bottom:1px solid var(--border); }
-        .header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-        h1 { font-size:28px; font-weight:700; letter-spacing:-0.02em; color:var(--text); }
-        .subtitle { color:var(--muted); font-size:15px; font-weight:400; }
-        .badge { display:inline-block; background: linear-gradient(135deg, var(--accent), var(--accent-light)); color:white; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500; }
-
-        .back-link { display:inline-flex; align-items:center; gap:6px; color:var(--accent); text-decoration:none; font-size:14px; font-weight:500; margin-bottom:16px; transition: gap .2s ease; }
-        .back-link:hover { gap:10px; }
-
-        .section { background:var(--card); border-radius:var(--radius); padding:36px; margin-bottom:32px; border:1px solid var(--border); box-shadow:0 1px 3px var(--shadow); transition: all .3s cubic-bezier(.4,0,.2,1); opacity:0; transform:translateY(20px); }
-        .section.visible { opacity:1; transform:translateY(0); }
-        .section:hover { box-shadow:0 4px 12px var(--shadow-hover); border-color:var(--accent-light); }
-        .section-header { margin-bottom:28px; }
-        .section-label { color:white; background:var(--accent); font-size:13px; font-weight:600; text-transform:uppercase; padding:6px 14px; border-radius:6px; display:inline-block; margin-bottom:12px; }
-        .section-title { font-size:24px; font-weight:600; color:var(--text); margin-bottom:4px; }
-        .section-description { color:var(--muted); font-size:14px; line-height:1.5; }
-
-        .photo-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:24px; margin:28px 0; }
-        .photo-card { position:relative; border-radius:var(--radius); overflow:hidden; background:var(--bg); border:1px solid var(--border); transition:all .3s ease; cursor:pointer; }
-        .photo-card:hover { transform:translateY(-4px); box-shadow:0 8px 24px var(--shadow-hover); border-color:var(--accent-light); }
-        .photo-wrapper { position:relative; width:100%; height:360px; overflow:hidden; background:#f3f4f6; }
-        .photo-card img { width:100%; height:100%; object-fit:cover; transition: transform .4s ease, object-fit .2s ease; display:block; background:#f3f4f6; }
-        .photo-card.contain img { object-fit:contain; background:#111; }
-        .photo-card:hover img { transform:scale(1.05); }
-        .photo-label { position:absolute; top:12px; left:12px; background: rgba(29,78,216,0.95); color:white; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600; z-index:2; }
-        .photo-info { padding:16px; }
-        .photo-title { font-size:15px; font-weight:600; color:var(--text); margin-bottom:4px; }
-        .photo-subtitle { font-size:14px; color:var(--muted); line-height:1.5; }
-
-        .fit-toggle { position:absolute; top:10px; right:10px; z-index:3; background: rgba(255,255,255,0.9); border:1px solid var(--border); color:var(--text); padding:6px 8px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; backdrop-filter: blur(4px); }
-        .fit-toggle:hover { background:white; box-shadow:0 6px 14px rgba(0,0,0,0.06); }
-
-        .explanation { background:#f0f6ff; border-left:4px solid var(--accent); padding:20px; border-radius:0 var(--radius) var(--radius) 0; margin:28px 0; }
-        .explanation h3 { font-size:16px; font-weight:600; margin-bottom:12px; }
-        .explanation p { color:var(--text); font-size:14px; line-height:1.6; margin-bottom:10px; }
-
-        .vote-section { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:32px; padding-top:24px; border-top:1px solid var(--border); }
-        .vote-btn { background:white; border:1.5px solid var(--border); color:var(--text); padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:500; font-size:14px; display:flex; align-items:center; gap:8px; }
-        .vote-btn.upvote { border-color:#10b981; color:#059669; } .vote-btn.upvote:hover { background:#10b981; color:white; }
-        .vote-btn.downvote { border-color:#ef4444; color:#dc2626; } .vote-btn.downvote:hover { background:#ef4444; color:white; }
-        .vote-btn[disabled] { opacity:0.6; cursor:not-allowed; transform:none; }
-
-        .vote-count { background:white; border:1.5px solid var(--accent); color:var(--accent); padding:10px 20px; border-radius:8px; font-weight:600; font-size:15px; min-width:100px; text-align:center; }
-
-        footer { text-align:center; padding:40px 24px; color:var(--muted); font-size:14px; border-top:1px solid var(--border); margin-top:48px; }
-        footer p { margin:4px 0; }
-
-        .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(3,7,12,0.75); z-index:2000; padding:20px; }
-        .modal.open { display:flex; }
-        .modal-content { max-width:96%; max-height:92%; display:flex; align-items:center; justify-content:center; }
-        .modal img { max-width:100%; max-height:100%; object-fit:contain; border-radius:8px; box-shadow:0 30px 80px rgba(2,6,23,0.8); }
-        .modal-close { position:absolute; top:18px; right:20px; background:rgba(255,255,255,0.95); border:1px solid var(--border); padding:8px 10px; border-radius:8px; cursor:pointer; z-index:2100; font-weight:700; }
-        .modal-caption { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); color:white; font-size:14px; background:rgba(0,0,0,0.35); padding:8px 12px; border-radius:8px; z-index:2100; backdrop-filter: blur(6px); }
-
-        @media (max-width:768px) {
-            .container { padding:24px 16px 60px; }
-            h1 { font-size:24px; }
-            .section { padding:24px 20px; }
-            .section-title { font-size:20px; }
-            .photo-grid { grid-template-columns:1fr; gap:20px; }
-            .vote-section { flex-direction:column; gap:12px; }
-            .vote-btn, .vote-count { width:100%; justify-content:center; }
-            .header-top { flex-direction:column; align-items:flex-start; gap:12px; }
-        }
-
-        html { scroll-behavior: smooth; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CS-4912 — Assignment 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Your existing CSS (kept exactly as you wanted) */
+    :root{--bg:#fafbfd;--card:#ffffff;--text:#0f1419;--muted:#536471;--accent:#1d4ed8;--accent-light:#3b82f6;--border:#e5e7eb;--shadow:rgba(0,0,0,0.04);--shadow-hover:rgba(29,78,216,0.12);--radius:12px;--maxw:1080px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;line-height:1.6}
+    .progress-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent-light));z-index:1000;transition:width .1s ease}
+    .container{width:100%;max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px}
+    header{margin-bottom:48px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+    .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    h1{font-size:28px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+    .subtitle{color:var(--muted);font-size:15px;font-weight:400}
+    .badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:white;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500}
+    .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);text-decoration:none;font-size:14px;font-weight:500;margin-bottom:16px;transition:gap .2s ease}
+    .back-link:hover{gap:10px}
+    .section{background:var(--card);border-radius:var(--radius);padding:36px;margin-bottom:32px;border:1px solid var(--border);box-shadow:0 1px 3px var(--shadow);transition:all .3s cubic-bezier(.4,0,.2,1);opacity:0;transform:translateY(20px)}
+    .section.visible{opacity:1;transform:translateY(0)}
+    .section:hover{box-shadow:0 4px 12px var(--shadow-hover);border-color:var(--accent-light)}
+    .section-header{margin-bottom:28px}
+    .section-label{color:white;background:var(--accent);font-size:13px;font-weight:600;text-transform:uppercase;padding:6px 14px;border-radius:6px;display:inline-block;margin-bottom:12px}
+    .section-title{font-size:24px;font-weight:600;color:var(--text);margin-bottom:4px}
+    .section-description{color:var(--muted);font-size:14px;line-height:1.5}
+    .photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;margin:28px 0}
+    .photo-card{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--bg);border:1px solid var(--border);transition:all .3s ease;cursor:pointer}
+    .photo-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px var(--shadow-hover);border-color:var(--accent-light)}
+    .photo-wrapper{position:relative;width:100%;height:360px;overflow:hidden;background:#f3f4f6}
+    .photo-card img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease,object-fit .2s ease;display:block;background:#f3f4f6}
+    .photo-card.contain img{object-fit:contain;background:#111}
+    .photo-card:hover img{transform:scale(1.05)}
+    .photo-label{position:absolute;top:12px;left:12px;background:rgba(29,78,216,0.95);color:white;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;z-index:2}
+    .photo-info{padding:16px}
+    .photo-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+    .photo-subtitle{font-size:14px;color:var(--muted);line-height:1.5}
+    .fit-toggle{position:absolute;top:10px;right:10px;z-index:3;background:rgba(255,255,255,0.9);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;backdrop-filter:blur(4px)}
+    .fit-toggle:hover{background:white;box-shadow:0 6px 14px rgba(0,0,0,0.06)}
+    .explanation{background:#f0f6ff;border-left:4px solid var(--accent);padding:20px;border-radius:0 var(--radius) var(--radius) 0;margin:28px 0}
+    .explanation h3{font-size:16px;font-weight:600;margin-bottom:12px}
+    .explanation p{color:var(--text);font-size:14px;line-height:1.6;margin-bottom:10px}
+    .vote-section{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:32px;padding-top:24px;border-top:1px solid var(--border)}
+    .vote-btn{background:white;border:1.5px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:500;font-size:14px;display:flex;align-items:center;gap:8px}
+    .vote-btn.upvote{border-color:#10b981;color:#059669}.vote-btn.upvote:hover{background:#10b981;color:white}
+    .vote-btn.downvote{border-color:#ef4444;color:#dc2626}.vote-btn.downvote:hover{background:#ef4444;color:white}
+    .vote-btn[disabled]{opacity:0.6;cursor:not-allowed;transform:none}
+    .vote-count{background:white;border:1.5px solid var(--accent);color:var(--accent);padding:10px 20px;border-radius:8px;font-weight:600;font-size:15px;min-width:100px;text-align:center}
+    footer{text-align:center;padding:40px 24px;color:var(--muted);font-size:14px;border-top:1px solid var(--border);margin-top:48px}
+    footer p{margin:4px 0}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(3,7,12,0.75);z-index:2000;padding:20px}
+    .modal.open{display:flex}
+    .modal-content{max-width:96%;max-height:92%;display:flex;align-items:center;justify-content:center}
+    .modal img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 30px 80px rgba(2,6,23,0.8)}
+    .modal-close{position:absolute;top:18px;right:20px;background:rgba(255,255,255,0.95);border:1px solid var(--border);padding:8px 10px;border-radius:8px;cursor:pointer;z-index:2100;font-weight:700}
+    .modal-caption{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);color:white;font-size:14px;background:rgba(0,0,0,0.35);padding:8px 12px;border-radius:8px;z-index:2100;backdrop-filter:blur(6px)}
+    @media (max-width:768px){.container{padding:24px 16px 60px}h1{font-size:24px}.section{padding:24px 20px}.section-title{font-size:20px}.photo-grid{grid-template-columns:1fr;gap:20px}.vote-section{flex-direction:column;gap:12px}.vote-btn,.vote-count{width:100%;justify-content:center}.header-top{flex-direction:column;align-items:flex-start;gap:12px}}html{scroll-behavior:smooth}
+  </style>
+  <!-- Google Identity Services (GSI) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-    <div class="progress-bar" id="progressBar"></div>
+  <div class="progress-bar" id="progressBar"></div>
 
-    <div class="container">
-        <a href="index.html" class="back-link">← Back to Assignments</a>
-
-        <header>
-            <div class="header-top">
-                <div>
-                    <h1>Assignment 1: Photography & Perspective</h1>
-                    <p class="subtitle">Shreenand Bhattad • CS-4912 • Spring 2026</p>
-                </div>
-                <span class="badge">Computer Vision</span>
-            </div>
-        </header>
-
-        <!-- Part 1 -->
-        <section class="section" data-section="1">
-            <div class="section-header">
-                <div class="section-label">Part 01</div>
-                <h2 class="section-title">Portrait Perspective</h2>
-                <p class="section-description">Close vs. distant camera positions</p>
-            </div>
-
-            <div class="photo-grid">
-                <div class="photo-card">
-                    <div class="photo-wrapper">
-                        <div class="photo-label">Photo A</div>
-                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
-                        <img src="Photo1.png" alt="Close-up portrait">
-                    </div>
-                    <div class="photo-info">
-                        <div class="photo-title">Close Distance</div>
-                        <div class="photo-subtitle">Camera near subject, no zoom</div>
-                    </div>
-                </div>
-
-                <div class="photo-card">
-                    <div class="photo-wrapper">
-                        <div class="photo-label">Photo B</div>
-                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
-                        <img src="Photo2.png" alt="Stepped-back portrait">
-                    </div>
-                    <div class="photo-info">
-                        <div class="photo-title">Stepped Back + Zoom</div>
-                        <div class="photo-subtitle">Camera farther, zoomed in</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="explanation">
-                <h3>Analysis</h3>
-                <p><strong>Photo A:</strong> Close camera position exaggerates depth. Nose appears larger, ears pushed back—unflattering distortion.</p>
-                <p><strong>Photo B:</strong> Stepping back equalizes distances from camera to all facial features, eliminating distortion for natural proportions.</p>
-                <p><strong>Takeaway:</strong> Distance controls perspective, not zoom. Zoom only changes field of view.</p>
-            </div>
-
-            <div class="vote-section">
-                <button class="vote-btn upvote" data-section="1" onclick="vote(1,'up')">Upvote</button>
-                <div class="vote-count" id="votes-1">0 votes</div>
-                <button class="vote-btn downvote" data-section="1" onclick="vote(1,'down')">Downvote</button>
-            </div>
-        </section>
-
-        <!-- Part 2 -->
-        <section class="section" data-section="2">
-            <div class="section-header">
-                <div class="section-label">Part 02</div>
-                <h2 class="section-title">Street Compression</h2>
-                <p class="section-description">Telephoto vs. natural depth</p>
-            </div>
-
-            <div class="photo-grid">
-                <div class="photo-card">
-                    <div class="photo-wrapper">
-                        <div class="photo-label">Photo C</div>
-                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
-                        <img src="photo3.png" alt="Street zoomed from distance">
-                    </div>
-                    <div class="photo-info">
-                        <div class="photo-title">Far + Zoomed</div>
-                        <div class="photo-subtitle">Telephoto compression</div>
-                    </div>
-                </div>
-
-                <div class="photo-card">
-                    <div class="photo-wrapper">
-                        <div class="photo-label">Photo D</div>
-                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
-                        <img src="Photo4.png" alt="Street from closer position">
-                    </div>
-                    <div class="photo-info">
-                        <div class="photo-title">Walked Forward</div>
-                        <div class="photo-subtitle">Natural perspective</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="explanation">
-                <h3>Analysis</h3>
-                <p><strong>Photo C:</strong> Distant position + zoom flattens the scene. Objects appear stacked, depth compressed.</p>
-                <p><strong>Photo D:</strong> Moving closer preserves true spatial relationships. Clear separation and natural depth.</p>
-                <p><strong>Takeaway:</strong> From far away, distance differences are proportionally small. Up close, differences create stronger perspective.</p>
-            </div>
-
-            <div class="vote-section">
-                <button class="vote-btn upvote" data-section="2" onclick="vote(2,'up')">Upvote</button>
-                <div class="vote-count" id="votes-2">0 votes</div>
-                <button class="vote-btn downvote" data-section="2" onclick="vote(2,'down')">Downvote</button>
-            </div>
-        </section>
-
-        <!-- Part 3 -->
-        <section class="section" data-section="3">
-            <div class="section-header">
-                <div class="section-label">Part 03</div>
-                <h2 class="section-title">Projection Types</h2>
-                <p class="section-description">Perspective vs. orthographic</p>
-            </div>
-
-            <div class="photo-grid">
-                <div class="photo-card">
-                    <div class="photo-wrapper">
-                        <div class="photo-label">Perspective</div>
-                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
-                        <img src="Photo5.png" alt="Perspective projection">
-                    </div>
-                    <div class="photo-info">
-                        <div class="photo-title">Perspective Projection</div>
-                        <div class="photo-subtitle">Lines converge to vanishing points</div>
-                    </div>
-                </div>
-
-                <div class="photo-card">
-                    <div class="photo-wrapper">
-                        <div class="photo-label">Orthographic</div>
-                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
-                        <img src="Photo6.png" alt="Orthographic projection">
-                    </div>
-                    <div class="photo-info">
-                        <div class="photo-title">Orthographic-like</div>
-                        <div class="photo-subtitle">Parallel lines stay parallel</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="explanation">
-                <h3>Analysis</h3>
-                <p><strong>Perspective:</strong> How cameras/eyes see. Parallel lines converge (red annotations show vanishing points). Creates 3D depth.</p>
-                <p><strong>Orthographic:</strong> Used in technical drawings. Parallel lines stay parallel. Approximated via extreme distance + zoom or center crop.</p>
-                <p><strong>CV Relevance:</strong> Perspective requires camera calibration. Orthographic simplifies some algorithms and is useful in controlled views.</p>
-            </div>
-
-            <div class="vote-section">
-                <button class="vote-btn upvote" data-section="3" onclick="vote(3,'up')">Upvote</button>
-                <div class="vote-count" id="votes-3">0 votes</div>
-                <button class="vote-btn downvote" data-section="3" onclick="vote(3,'down')">Downvote</button>
-            </div>
-        </section>
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <a href="index.html" class="back-link">← Back to Assignments</a>
+      <!-- Sign-in status -->
+      <div id="gsiRoot" style="display:flex;align-items:center;gap:12px">
+        <div id="signinStatus" style="color:var(--muted);font-size:14px">Not signed in</div>
+        <div id="gsiButton"></div>
+      </div>
     </div>
 
-    <footer>
-        <p>CS-4912: Computer Vision • Spring 2026</p>
-        <p>Professor Raghavendra Singh</p>
-    </footer>
-
-    <div id="modal" class="modal" onclick="closeModal(event)">
-        <button class="modal-close" aria-label="Close" onclick="closeModal(event)">✕</button>
-        <div class="modal-content">
-            <img id="modalImg" src="" alt="expanded">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1>Assignment 1: Photography & Perspective</h1>
+          <p class="subtitle">Shreenand Bhattad • CS-4912 • Spring 2026</p>
         </div>
-        <div id="modalCaption" class="modal-caption" aria-hidden="true"></div>
-    </div>
+        <span class="badge">Computer Vision</span>
+      </div>
+    </header>
 
-    <script>
-    // ===== CONFIG =====
-    // Use your working Apps Script web app URL (you gave earlier)
-    const WEBAPP_URL = 'https://script.google.com/a/macros/ashoka.edu.in/s/AKfycbz_WLzWgPcC5tbCnqs7wihBUjrw8zHlRzdS3GbjN3HdTLk_W2tSrVKSh9cKJV2pUvEEcQ/exec';
+    <!-- (Your sections here, unchanged layout) -->
+    <!-- Part 1 -->
+    <section class="section" data-section="1">
+      <div class="section-header">
+        <div class="section-label">Part 01</div>
+        <h2 class="section-title">Portrait Perspective</h2>
+        <p class="section-description">Close vs. distant camera positions</p>
+      </div>
 
-    // ===== progress bar =====
-    window.addEventListener('scroll', () => {
-        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-        const scrolled = window.scrollY;
-        const pct = scrollable > 0 ? (scrolled / scrollable * 100) : 0;
-        document.getElementById('progressBar').style.width = pct + '%';
+      <div class="photo-grid">
+        <div class="photo-card">
+          <div class="photo-wrapper">
+            <div class="photo-label">Photo A</div>
+            <button class="fit-toggle" title="Toggle fit mode">↔</button>
+            <img src="Photo1.png" alt="Close-up portrait">
+          </div>
+          <div class="photo-info">
+            <div class="photo-title">Close Distance</div>
+            <div class="photo-subtitle">Camera near subject, no zoom</div>
+          </div>
+        </div>
+
+        <div class="photo-card">
+          <div class="photo-wrapper">
+            <div class="photo-label">Photo B</div>
+            <button class="fit-toggle" title="Toggle fit mode">↔</button>
+            <img src="Photo2.png" alt="Stepped-back portrait">
+          </div>
+          <div class="photo-info">
+            <div class="photo-title">Stepped Back + Zoom</div>
+            <div class="photo-subtitle">Camera farther, zoomed in</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="explanation">
+        <h3>Analysis</h3>
+        <p><strong>Photo A:</strong> Close camera position exaggerates depth. Nose appears larger, ears pushed back—unflattering distortion.</p>
+        <p><strong>Photo B:</strong> Stepping back equalizes distances from camera to all facial features, eliminating distortion for natural proportions.</p>
+        <p><strong>Takeaway:</strong> Distance controls perspective, not zoom. Zoom only changes field of view.</p>
+      </div>
+
+      <div class="vote-section">
+        <button class="vote-btn upvote" data-section="1" onclick="vote(1,'up')">Upvote</button>
+        <div class="vote-count" id="votes-1">0 votes</div>
+        <button class="vote-btn downvote" data-section="1" onclick="vote(1,'down')">Downvote</button>
+      </div>
+    </section>
+
+    <!-- Part 2 -->
+    <section class="section" data-section="2">
+      <div class="section-header">
+        <div class="section-label">Part 02</div>
+        <h2 class="section-title">Street Compression</h2>
+        <p class="section-description">Telephoto vs. natural depth</p>
+      </div>
+
+      <div class="photo-grid">
+        <div class="photo-card">
+          <div class="photo-wrapper">
+            <div class="photo-label">Photo C</div>
+            <button class="fit-toggle" title="Toggle fit mode">↔</button>
+            <img src="photo3.png" alt="Street zoomed from distance">
+          </div>
+          <div class="photo-info">
+            <div class="photo-title">Far + Zoomed</div>
+            <div class="photo-subtitle">Telephoto compression</div>
+          </div>
+        </div>
+
+        <div class="photo-card">
+          <div class="photo-wrapper">
+            <div class="photo-label">Photo D</div>
+            <button class="fit-toggle" title="Toggle fit mode">↔</button>
+            <img src="Photo4.png" alt="Street from closer position">
+          </div>
+          <div class="photo-info">
+            <div class="photo-title">Walked Forward</div>
+            <div class="photo-subtitle">Natural perspective</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="explanation">
+        <h3>Analysis</h3>
+        <p><strong>Photo C:</strong> Distant position + zoom flattens the scene. Objects appear stacked, depth compressed.</p>
+        <p><strong>Photo D:</strong> Moving closer preserves true spatial relationships. Clear separation and natural depth.</p>
+        <p><strong>Takeaway:</strong> From far away, distance differences are proportionally small. Up close, differences create stronger perspective.</p>
+      </div>
+
+      <div class="vote-section">
+        <button class="vote-btn upvote" data-section="2" onclick="vote(2,'up')">Upvote</button>
+        <div class="vote-count" id="votes-2">0 votes</div>
+        <button class="vote-btn downvote" data-section="2" onclick="vote(2,'down')">Downvote</button>
+      </div>
+    </section>
+
+    <!-- Part 3 -->
+    <section class="section" data-section="3">
+      <div class="section-header">
+        <div class="section-label">Part 03</div>
+        <h2 class="section-title">Projection Types</h2>
+        <p class="section-description">Perspective vs. orthographic</p>
+      </div>
+
+      <div class="photo-grid">
+        <div class="photo-card">
+          <div class="photo-wrapper">
+            <div class="photo-label">Perspective</div>
+            <button class="fit-toggle" title="Toggle fit mode">↔</button>
+            <img src="Photo5.png" alt="Perspective projection">
+          </div>
+          <div class="photo-info">
+            <div class="photo-title">Perspective Projection</div>
+            <div class="photo-subtitle">Lines converge to vanishing points</div>
+          </div>
+        </div>
+
+        <div class="photo-card">
+          <div class="photo-wrapper">
+            <div class="photo-label">Orthographic</div>
+            <button class="fit-toggle" title="Toggle fit mode">↔</button>
+            <img src="Photo6.png" alt="Orthographic projection">
+          </div>
+          <div class="photo-info">
+            <div class="photo-title">Orthographic-like</div>
+            <div class="photo-subtitle">Parallel lines stay parallel</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="explanation">
+        <h3>Analysis</h3>
+        <p><strong>Perspective:</strong> How cameras/eyes see. Parallel lines converge (red annotations show vanishing points). Creates 3D depth.</p>
+        <p><strong>Orthographic:</strong> Used in technical drawings. Parallel lines stay parallel. Approximated via extreme distance + zoom or center crop.</p>
+        <p><strong>CV Relevance:</strong> Perspective requires camera calibration. Orthographic simplifies some algorithms and is useful in controlled views.</p>
+      </div>
+
+      <div class="vote-section">
+        <button class="vote-btn upvote" data-section="3" onclick="vote(3,'up')">Upvote</button>
+        <div class="vote-count" id="votes-3">0 votes</div>
+        <button class="vote-btn downvote" data-section="3" onclick="vote(3,'down')">Downvote</button>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <p>CS-4912: Computer Vision • Spring 2026</p>
+    <p>Professor Raghavendra Singh</p>
+  </footer>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" onclick="closeModal(event)">
+    <button class="modal-close" aria-label="Close" onclick="closeModal(event)">✕</button>
+    <div class="modal-content"><img id="modalImg" src="" alt="expanded"></div>
+    <div id="modalCaption" class="modal-caption" aria-hidden="true"></div>
+  </div>
+
+  <script>
+  // ----- CONFIG: put your values here -----
+  const CLIENT_ID = 'https://script.google.com/a/macros/ashoka.edu.in/s/AKfycbxUeLMnkI4HKPPp6viX2UraQ4YANQZlOojzd2n5kj71nitF9y9TPOx0W_JsruV9rhkfGA/exec'; // <-- replace with OAuth client ID
+  const WEBAPP_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'; // <-- replace with your Apps Script web app URL
+  // ----------------------------------------
+
+  // GSI setup
+  let currentIdToken = null;
+  function handleCredentialResponse(response) {
+    currentIdToken = response.credential;
+    // quick parse JWT to display user email locally (optional)
+    try {
+      const payload = JSON.parse(atob(currentIdToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+      document.getElementById('signinStatus').textContent = payload.email || 'Signed in';
+    } catch (err) {
+      document.getElementById('signinStatus').textContent = 'Signed in';
+    }
+  }
+  window.onload = function() {
+    // initialize GSI
+    google.accounts.id.initialize({
+      client_id: CLIENT_ID,
+      callback: handleCredentialResponse,
+      auto_select: false,
+      cancel_on_tap_outside: true
     });
+    // render a compact button
+    google.accounts.id.renderButton(
+      document.getElementById('gsiButton'),
+      { theme: 'outline', size: 'small' }
+    );
+    // optional prompt
+    // google.accounts.id.prompt();
+  };
 
-    // reveal on scroll
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.classList.add('visible');
-        });
-    }, { threshold: 0.15 });
-    document.querySelectorAll('.section').forEach(s => observer.observe(s));
+  // Progress bar and reveal observer
+  window.addEventListener('scroll', () => {
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    const scrolled = window.scrollY;
+    const pct = scrollable>0 ? (scrolled/scrollable*100) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+  });
+  const observer = new IntersectionObserver(entries => entries.forEach(en => { if(en.isIntersecting) en.target.classList.add('visible'); }), {threshold:0.15});
+  document.querySelectorAll('.section').forEach(s => observer.observe(s));
 
-    // ===== VOTING logic =====
-
-    // stable voter id stored in localStorage (simple UUID v4-ish)
-    function getVoterId() {
-        let id = localStorage.getItem('cv_voter_id');
-        if (!id) {
-            // small UUID generator
-            id = 'v_' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-            );
-            localStorage.setItem('cv_voter_id', id);
-        }
-        return id;
+  // voter id (local, stable)
+  function getVoterId() {
+    let id = localStorage.getItem('cv_voter_id');
+    if (!id) {
+      id = 'v_' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+      );
+      localStorage.setItem('cv_voter_id', id);
     }
+    return id;
+  }
 
-    // local single-vote marker per section
-    function markVotedLocal(section) {
-        localStorage.setItem(`cv_voted_${section}`, '1');
-        disableVoteButtons(section, true);
+  // local single-vote marker
+  function markVotedLocal(section) { localStorage.setItem(`cv_voted_${section}`, '1'); disableVoteButtons(section, true); }
+  function hasVotedLocal(section) { return localStorage.getItem(`cv_voted_${section}`) === '1'; }
+  function disableVoteButtons(section, disable) {
+    const sec = document.querySelector(`.section[data-section="${section}"]`);
+    if (!sec) return;
+    const up = sec.querySelector('.vote-btn.upvote');
+    const down = sec.querySelector('.vote-btn.downvote');
+    [up,down].forEach(b => { if (!b) return; b.disabled = disable; b.style.opacity = disable ? 0.6 : 1; });
+  }
+
+  // update UI counts
+  function updateDisplay(section, counts) {
+    const count = counts && counts[String(section)] ? counts[String(section)] : 0;
+    const text = Math.abs(count) === 1 ? 'vote' : 'votes';
+    const el = document.getElementById(`votes-${section}`);
+    if (el) el.textContent = `${count} ${text}`;
+  }
+
+  // fetch counts (GET)
+  async function fetchCounts() {
+    try {
+      const res = await fetch(WEBAPP_URL);
+      const j = await res.json();
+      if (j && j.success && j.counts) {
+        updateDisplay(1, j.counts); updateDisplay(2, j.counts); updateDisplay(3, j.counts);
+      }
+    } catch (err) { console.warn('fetchCounts error', err); }
+  }
+
+  // send vote (POST) using form-encoded body to avoid preflight
+  async function sendVoteToServer(section,type) {
+    if (!currentIdToken) {
+      // prompt sign-in
+      google.accounts.id.prompt();
+      alert('Please sign in with your Ashoka account first (use the sign-in button top-right).');
+      return { success: false, error: 'not_signed_in' };
     }
-    function hasVotedLocal(section) {
-        return localStorage.getItem(`cv_voted_${section}`) === '1';
+    const voter_id = getVoterId();
+    const body = new URLSearchParams();
+    body.append('voter_id', voter_id);
+    body.append('section', String(section));
+    body.append('type', String(type));
+    body.append('id_token', currentIdToken);
+
+    try {
+      const res = await fetch(WEBAPP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      });
+      return await res.json();
+    } catch (err) {
+      console.error('sendVote error', err);
+      return { success: false, error: 'network' };
     }
-    function disableVoteButtons(section, disable) {
-        const secEl = document.querySelector(`.section[data-section="${section}"]`);
-        if (!secEl) return;
-        const up = secEl.querySelector('.vote-btn.upvote');
-        const down = secEl.querySelector('.vote-btn.downvote');
-        [up, down].forEach(btn => { if (!btn) return; btn.disabled = disable; btn.style.opacity = disable ? 0.6 : 1; });
+  }
+
+  // main vote handler (invoked by buttons)
+  async function vote(section,type) {
+    if (hasVotedLocal(section)) {
+      alert('You already voted for this section in this browser.');
+      return;
     }
-
-    // update displayed counts
-    function updateDisplay(section, counts) {
-        const count = (counts && counts[String(section)]) ? counts[String(section)] : 0;
-        const text = Math.abs(count) === 1 ? 'vote' : 'votes';
-        const el = document.getElementById(`votes-${section}`);
-        if (el) el.textContent = `${count} ${text}`;
+    disableVoteButtons(section, true);
+    const result = await sendVoteToServer(section,type);
+    if (!result) {
+      alert('Network error. Try again later.');
+      disableVoteButtons(section, false);
+      return;
     }
-
-    // fetch counts from server
-    async function fetchCountsFromServer() {
-        try {
-            const res = await fetch(WEBAPP_URL, { method: 'GET' });
-            const j = await res.json();
-            if (j && j.success && j.counts) {
-                updateDisplay(1, j.counts);
-                updateDisplay(2, j.counts);
-                updateDisplay(3, j.counts);
-            }
-        } catch (err) {
-            console.warn('fetchCounts error', err);
-        }
+    if (result.success) {
+      markVotedLocal(section);
+      updateDisplay(section, result.counts || {});
+      alert('Vote recorded. Thanks.');
+      return;
     }
-
-    // POST a vote to server
-    async function sendVoteToServer(section, type) {
-        const voter_id = getVoterId();
-        try {
-            const res = await fetch(WEBAPP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ voter_id, section: String(section), type: String(type) })
-            });
-            const j = await res.json();
-            return j;
-        } catch (err) {
-            console.error('sendVoteToServer error', err);
-            return { success: false, error: 'network' };
-        }
+    // handle server errors
+    if (result.error === 'not_signed_in' || result.error === 'invalid_token') {
+      google.accounts.id.prompt();
+      alert('Sign-in required. Please sign in with your Ashoka account.');
+      disableVoteButtons(section, false);
+      return;
     }
-
-    // public vote function wired to buttons
-    async function vote(section, type) {
-        // local guard
-        if (hasVotedLocal(section)) {
-            alert('You already voted for this section from this browser.');
-            return;
-        }
-
-        // disable UI while in-flight
-        disableVoteButtons(section, true);
-
-        const result = await sendVoteToServer(section, type);
-        if (!result) {
-            alert('Network/server error. Try again later.');
-            disableVoteButtons(section, false);
-            return;
-        }
-
-        if (result.success) {
-            markVotedLocal(section);
-            updateDisplay(section, result.counts || {});
-            // small confirmation
-            const sign = (type === 'up') ? 'Thanks — upvoted.' : 'Downvoted.';
-            // avoid blocking: just a short non-blocking message using console + optional alert
-            console.log(sign);
-            // friendly small alert
-            alert('Vote recorded. Thank you.');
-            return;
-        }
-
-        // server returned an error
-        if (result.error === 'already_voted') {
-            markVotedLocal(section);
-            updateDisplay(section, result.counts || {});
-            alert('Our records show this voter already voted for this submission.');
-            return;
-        }
-
-        // other server-side errors
-        alert('Vote failed: ' + (result.error || 'unknown'));
-        disableVoteButtons(section, false);
+    if (result.error === 'forbidden_domain') {
+      alert('Voting restricted to ashoka.edu.in accounts.');
+      disableVoteButtons(section, true);
+      return;
     }
-
-    // initialize UI on load
-    window.addEventListener('DOMContentLoaded', async () => {
-        // ensure voter id exists
-        getVoterId();
-        // disable vote buttons for sections the user already voted in this browser
-        [1,2,3].forEach(s => { if (hasVotedLocal(s)) disableVoteButtons(s, true); });
-        // fetch counts
-        await fetchCountsFromServer();
-    });
-
-    // ===== modal & fit-toggle behavior =====
-    function openModal(src, caption) {
-        const modal = document.getElementById('modal');
-        document.getElementById('modalImg').src = src;
-        document.getElementById('modalCaption').textContent = caption || '';
-        modal.classList.add('open');
+    if (result.error === 'already_voted') {
+      markVotedLocal(section);
+      updateDisplay(section, result.counts || {});
+      alert('Our server shows you already voted for this section.');
+      return;
     }
-    function closeModal(e) {
-        if (!e) return;
-        if (e.target.classList && (e.target.classList.contains('modal') || e.target.classList.contains('modal-close'))) {
-            const modal = document.getElementById('modal');
-            modal.classList.remove('open');
-            document.getElementById('modalImg').src = '';
-            document.getElementById('modalCaption').textContent = '';
-        }
+    alert('Vote failed: ' + (result.error || 'unknown'));
+    disableVoteButtons(section, false);
+  }
+
+  // modal & fit-toggle (unchanged)
+  function openModal(src, caption) { const modal=document.getElementById('modal'); document.getElementById('modalImg').src = src; document.getElementById('modalCaption').textContent = caption||''; modal.classList.add('open'); }
+  function closeModal(e) { if (e && e.target && (e.target.classList.contains('modal')||e.target.classList.contains('modal-close'))) { const m=document.getElementById('modal'); m.classList.remove('open'); document.getElementById('modalImg').src=''; document.getElementById('modalCaption').textContent=''; } }
+  document.querySelectorAll('.photo-card').forEach(card => {
+    const wrapper = card.querySelector('.photo-wrapper');
+    const img = card.querySelector('img');
+    const toggle = card.querySelector('.fit-toggle');
+    wrapper.addEventListener('click', ev => { if (ev.target===toggle || (toggle && toggle.contains(ev.target))) return; const src = img.getAttribute('src')||img.src; openModal(src, img.getAttribute('alt')||''); });
+    if (toggle) {
+      toggle.addEventListener('click', ev => { ev.stopPropagation(); if (card.classList.contains('contain')) { card.classList.remove('contain'); toggle.textContent='↔'; toggle.title='Show full bleed (cover)'; } else { card.classList.add('contain'); toggle.textContent='⤢'; toggle.title='Fit image inside box (contain)'; }});
+      toggle.addEventListener('keydown', ev => { if (ev.key==='Enter'||ev.key===' ') { ev.preventDefault(); toggle.click(); }});
     }
+  });
+  window.addEventListener('keydown', ev => { if (ev.key==='Escape') { const modal=document.getElementById('modal'); if (modal.classList.contains('open')) closeModal({ target: modal }); }});
 
-    document.querySelectorAll('.photo-card').forEach(card => {
-        const wrapper = card.querySelector('.photo-wrapper');
-        const img = card.querySelector('img');
-        const toggle = card.querySelector('.fit-toggle');
+  // image fallback
+  document.querySelectorAll('.photo-card img').forEach(img => img.addEventListener('error', () => {
+    const placeholder = '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="48%" fill="#64748b" font-size="28" text-anchor="middle">Missing image</text><text x="50%" y="58%" fill="#94a3b8" font-size="20" text-anchor="middle">Upload PhotoX.png to the repo</text></svg>';
+    img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(placeholder);
+  }));
 
-        wrapper.addEventListener('click', (ev) => {
-            if (ev.target === toggle || (toggle && toggle.contains(ev.target))) return;
-            const src = img.getAttribute('src') || img.src;
-            openModal(src, img.getAttribute('alt') || '');
-        });
-
-        if (toggle) {
-            toggle.addEventListener('click', (ev) => {
-                ev.stopPropagation();
-                if (card.classList.contains('contain')) {
-                    card.classList.remove('contain');
-                    toggle.textContent = '↔';
-                    toggle.title = 'Show full bleed (cover)';
-                } else {
-                    card.classList.add('contain');
-                    toggle.textContent = '⤢';
-                    toggle.title = 'Fit image inside box (contain)';
-                }
-            });
-
-            toggle.addEventListener('keydown', (ev) => {
-                if (ev.key === 'Enter' || ev.key === ' ') {
-                    ev.preventDefault();
-                    toggle.click();
-                }
-            });
-        }
-    });
-
-    window.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Escape') {
-            const modal = document.getElementById('modal');
-            if (modal.classList.contains('open')) closeModal({ target: modal });
-        }
-    });
-
-    // image fallback
-    document.querySelectorAll('.photo-card img').forEach(img => {
-        img.addEventListener('error', () => {
-            const placeholder = '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="48%" fill="#64748b" font-size="28" text-anchor="middle">Missing image</text><text x="50%" y="58%" fill="#94a3b8" font-size="20" text-anchor="middle">Upload PhotoX.png to the repo</text></svg>';
-            img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(placeholder);
-        });
-    });
-    </script>
+  // init on load
+  window.addEventListener('DOMContentLoaded', async () => {
+    getVoterId();
+    [1,2,3].forEach(s => { if (hasVotedLocal(s)) disableVoteButtons(s, true); });
+    await fetchCounts();
+  });
+  </script>
 </body>
 </html>
