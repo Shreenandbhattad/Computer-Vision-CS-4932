@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS-4912: Computer Vision</title>
+    <title>CS-4912 — Assignment 1</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* (CSS unchanged from your version) */
         :root {
             --bg: #fafbfd;
             --card: #ffffff;
@@ -13,279 +14,459 @@
             --muted: #536471;
             --accent: #1d4ed8;
             --accent-light: #3b82f6;
+            --accent-hover: #1e40af;
             --border: #e5e7eb;
             --shadow: rgba(0, 0, 0, 0.04);
             --shadow-hover: rgba(29, 78, 216, 0.12);
             --radius: 12px;
-            --maxw: 900px;
-            --blue-bg: #eff6ff;
-            --green-bg: #ecfdf5;
+            --maxw: 1080px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html, body {
-            height: 100%;
-        }
-
+        * { box-sizing: border-box; margin:0; padding:0; }
+        html, body { height:100%; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            line-height: 1.6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
+            font-family:'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            line-height:1.6;
         }
 
-        .container {
-            width: 100%;
-            max-width: var(--maxw);
-            animation: fadeIn 0.6s ease-out;
-        }
+        .progress-bar { position: fixed; top:0; left:0; height:3px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); z-index:1000; transition: width .1s ease; }
+        .container { width:100%; max-width:var(--maxw); margin:0 auto; padding:40px 24px 80px; }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        header { margin-bottom:48px; padding-bottom:24px; border-bottom:1px solid var(--border); }
+        .header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+        h1 { font-size:28px; font-weight:700; letter-spacing:-0.02em; color:var(--text); }
+        .subtitle { color:var(--muted); font-size:15px; font-weight:400; }
+        .badge { display:inline-block; background: linear-gradient(135deg, var(--accent), var(--accent-light)); color:white; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500; }
 
-        /* Header Section */
-        .header {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 48px 40px;
-            margin-bottom: 32px;
-            box-shadow: 0 1px 3px var(--shadow);
-        }
+        .section { background:var(--card); border-radius:var(--radius); padding:36px; margin-bottom:32px; border:1px solid var(--border); box-shadow:0 1px 3px var(--shadow); transition:all .3s ease; opacity:0; transform:translateY(20px); }
+        .section.visible { opacity:1; transform:none; }
+        .section:hover { box-shadow:0 4px 12px var(--shadow-hover); border-color:var(--accent-light); }
+        .section-header { margin-bottom:28px; }
+        .section-label { color:white; background:var(--accent); font-size:13px; font-weight:600; text-transform:uppercase; padding:6px 14px; border-radius:6px; display:inline-block; margin-bottom:12px; }
+        .section-title { font-size:24px; font-weight:600; color:var(--text); margin-bottom:4px; }
+        .section-description { color:var(--muted); font-size:14px; }
 
-        .course-code {
-            color: var(--accent);
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
+        .photo-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:24px; margin:28px 0; }
+        .photo-card { position:relative; border-radius:var(--radius); overflow:hidden; background:var(--bg); border:1px solid var(--border); transition:all .3s ease; cursor:pointer; }
+        .photo-card:hover { transform:translateY(-4px); box-shadow:0 8px 24px var(--shadow-hover); border-color:var(--accent-light); }
+        .photo-wrapper { position:relative; width:100%; height:360px; overflow:hidden; background:#f3f4f6; }
+        .photo-card img { width:100%; height:100%; object-fit:cover; transition:transform .4s ease, object-fit .2s ease; display:block; background:#f3f4f6; }
+        .photo-card.contain img { object-fit:contain; background:#111; }
+        .photo-card:hover img { transform:scale(1.05); }
+        .photo-label { position:absolute; top:12px; left:12px; background: rgba(29,78,216,0.95); color:white; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600; z-index:2; }
+        .photo-info { padding:16px; }
+        .photo-title { font-size:15px; font-weight:600; color:var(--text); margin-bottom:4px; }
+        .photo-subtitle { font-size:14px; color:var(--muted); }
 
-        h1 {
-            font-size: 38px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: var(--text);
-            margin-bottom: 32px;
-        }
+        .fit-toggle { position:absolute; top:10px; right:10px; z-index:3; background: rgba(255,255,255,0.9); border:1px solid var(--border); color:var(--text); padding:6px 8px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; }
+        .fit-toggle:hover { background:white; box-shadow:0 6px 14px rgba(0,0,0,0.06); }
 
-        .header-meta {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
+        .explanation { background:#f0f6ff; border-left:4px solid var(--accent); padding:20px; border-radius:0 var(--radius) var(--radius) 0; margin:28px 0; }
+        .explanation h3 { font-size:16px; font-weight:600; margin-bottom:12px; }
+        .explanation p { color:var(--text); font-size:14px; line-height:1.6; margin-bottom:10px; }
 
-        .meta-item {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px 18px;
-        }
+        .vote-section { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:32px; padding-top:24px; border-top:1px solid var(--border); }
+        .vote-btn { background:white; border:1.5px solid var(--border); color:var(--text); padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:500; font-size:14px; display:flex; align-items:center; gap:8px; }
+        .vote-btn.upvote { border-color:#10b981; color:#059669; } .vote-btn.downvote { border-color:#ef4444; color:#dc2626; }
+        .vote-count { background:white; border:1.5px solid var(--accent); color:var(--accent); padding:10px 20px; border-radius:8px; font-weight:600; font-size:15px; min-width:100px; text-align:center; }
 
-        .meta-label {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 4px;
-        }
+        footer { text-align:center; padding:40px 24px; color:var(--muted); font-size:14px; border-top:1px solid var(--border); margin-top:48px; }
+        .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(3,7,12,0.75); z-index:2000; padding:20px; }
+        .modal.open { display:flex; }
+        .modal-content { max-width:96%; max-height:92%; display:flex; align-items:center; justify-content:center; }
+        .modal img { max-width:100%; max-height:100%; object-fit:contain; border-radius:8px; box-shadow:0 30px 80px rgba(2,6,23,0.8); }
+        .modal-close { position:absolute; top:18px; right:20px; background:rgba(255,255,255,0.95); border:1px solid var(--border); padding:8px 10px; border-radius:8px; cursor:pointer; z-index:2100; font-weight:700; }
+        .modal-caption { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); color:white; font-size:14px; background:rgba(0,0,0,0.35); padding:8px 12px; border-radius:8px; z-index:2100; }
 
-        .meta-value {
-            color: var(--text);
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        /* Assignments Grid */
-        .assignments {
-            display: grid;
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-
-        .assignment-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 32px 36px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-decoration: none;
-            display: block;
-            box-shadow: 0 1px 3px var(--shadow);
-            border-left: 4px solid var(--accent);
-        }
-
-        .assignment-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px var(--shadow-hover);
-            border-left-color: var(--accent-light);
-        }
-
-        .assignment-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .assignment-number {
-            color: var(--accent);
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .status-badge {
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            background: var(--green-bg);
-            color: #065f46;
-            border: 1px solid #86efac;
-        }
-
-        .assignment-title {
-            font-size: 22px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 8px;
-            letter-spacing: -0.01em;
-        }
-
-        .assignment-description {
-            color: var(--muted);
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .assignment-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-        }
-
-        .assignment-date {
-            color: var(--muted);
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .view-link {
-            color: var(--accent);
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: gap 0.2s ease;
-        }
-
-        .assignment-card:hover .view-link {
-            gap: 10px;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 32px 0 0;
-            color: var(--muted);
-            font-size: 13px;
-            border-top: 1px solid var(--border);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 32px;
-            }
-
-            .header {
-                padding: 32px 24px;
-            }
-
-            .header-meta {
-                grid-template-columns: 1fr;
-            }
-
-            .assignment-card {
-                padding: 24px;
-            }
-
-            .assignment-footer {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
+        @media (max-width:768px) {
+            .photo-grid { grid-template-columns:1fr; gap:20px; }
+            .vote-section { flex-direction:column; gap:12px; }
         }
     </style>
 </head>
 <body>
+    <div class="progress-bar" id="progressBar"></div>
+
     <div class="container">
-        <div class="header">
-            <div class="course-code">CS-4912</div>
-            <h1>Computer Vision</h1>
-            <div class="header-meta">
-                <div class="meta-item">
-                    <div class="meta-label">Student</div>
-                    <div class="meta-value">Shreenand Bhattad</div>
+        <a href="index.html" class="back-link">← Back to Assignments</a>
+        
+        <header>
+            <div class="header-top">
+                <div>
+                    <h1>Assignment 1: Photography & Perspective</h1>
+                    <p class="subtitle">Shreenand Bhattad • CS-4912 • Spring 2026</p>
                 </div>
-                <div class="meta-item">
-                    <div class="meta-label">Professor</div>
-                    <div class="meta-value">Raghavendra Singh</div>
+                <span class="badge">Computer Vision</span>
+            </div>
+        </header>
+
+        <!-- Part 1 -->
+        <section class="section" data-section="1">
+            <div class="section-header">
+                <div class="section-label">Part 01</div>
+                <h2 class="section-title">Portrait Perspective</h2>
+                <p class="section-description">Close vs. distant camera positions</p>
+            </div>
+            
+            <div class="photo-grid">
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <div class="photo-label">Photo A</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
+                        <img src="Photo1.png" alt="Close-up portrait">
+                    </div>
+                    <div class="photo-info">
+                        <div class="photo-title">Close Distance</div>
+                        <div class="photo-subtitle">Camera near subject, no zoom</div>
+                    </div>
                 </div>
-                <div class="meta-item">
-                    <div class="meta-label">Semester</div>
-                    <div class="meta-value">Spring 2026</div>
+                
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <div class="photo-label">Photo B</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
+                        <img src="Photo2.png" alt="Stepped-back portrait">
+                    </div>
+                    <div class="photo-info">
+                        <div class="photo-title">Stepped Back + Zoom</div>
+                        <div class="photo-subtitle">Camera farther, zoomed in</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="assignments">
-            <a href="assignment1.html" class="assignment-card">
-                <div class="assignment-header">
-                    <div class="assignment-number">Assignment 01</div>
-                    <span class="status-badge">Completed</span>
-                </div>
-                <h2 class="assignment-title">Photography & Perspective</h2>
-                <p class="assignment-description">
-                    Exploring perspective distortion through portrait photography, street scenes, and projection systems. Understanding how camera distance affects visual perception.
-                </p>
-                <div class="assignment-footer">
-                    <span class="assignment-date">Submitted: January 2026</span>
-                    <span class="view-link">View Project →</span>
-                </div>
-            </a>
-        </div>
+            <div class="explanation">
+                <h3>Analysis</h3>
+                <p><strong>Photo A:</strong> Close camera position exaggerates depth. Nose appears larger, ears pushed back—unflattering distortion.</p>
+                <p><strong>Photo B:</strong> Stepping back equalizes distances from camera to all facial features, eliminating distortion for natural proportions.</p>
+                <p><strong>Takeaway:</strong> Distance controls perspective, not zoom. Zoom only changes field of view.</p>
+            </div>
 
-        <footer>
-            <p>&copy; 2026 Shreenand Bhattad • CS-4912 Computer Vision</p>
-        </footer>
+            <div class="vote-section">
+                <button class="vote-btn upvote" id="up-1" onclick="vote(1, 'up')">Upvote</button>
+                <div class="vote-count" id="votes-1">0 votes</div>
+                <button class="vote-btn downvote" id="down-1" onclick="vote(1, 'down')">Downvote</button>
+            </div>
+        </section>
+
+        <!-- Part 2 -->
+        <section class="section" data-section="2">
+            <div class="section-header">
+                <div class="section-label">Part 02</div>
+                <h2 class="section-title">Street Compression</h2>
+                <p class="section-description">Telephoto vs. natural depth</p>
+            </div>
+            
+            <div class="photo-grid">
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <div class="photo-label">Photo C</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
+                        <img src="photo3.png" alt="Street zoomed from distance">
+                    </div>
+                    <div class="photo-info">
+                        <div class="photo-title">Far + Zoomed</div>
+                        <div class="photo-subtitle">Telephoto compression</div>
+                    </div>
+                </div>
+                
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <div class="photo-label">Photo D</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
+                        <img src="Photo4.png" alt="Street from closer position">
+                    </div>
+                    <div class="photo-info">
+                        <div class="photo-title">Walked Forward</div>
+                        <div class="Photo-subtitle">Natural perspective</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h3>Analysis</h3>
+                <p><strong>Photo C:</strong> Distant position + zoom flattens the scene. Objects appear stacked, depth compressed.</p>
+                <p><strong>Photo D:</strong> Moving closer preserves true spatial relationships. Clear separation and natural depth.</p>
+                <p><strong>Takeaway:</strong> From far away, distance differences are proportionally small (100m vs 110m = 10%). Up close, differences are large (10m vs 20m = 100%), creating stronger perspective.</p>
+            </div>
+
+            <div class="vote-section">
+                <button class="vote-btn upvote" id="up-2" onclick="vote(2, 'up')">Upvote</button>
+                <div class="vote-count" id="votes-2">0 votes</div>
+                <button class="vote-btn downvote" id="down-2" onclick="vote(2, 'down')">Downvote</button>
+            </div>
+        </section>
+
+        <!-- Part 3 -->
+        <section class="section" data-section="3">
+            <div class="section-header">
+                <div class="section-label">Part 03</div>
+                <h2 class="section-title">Projection Types</h2>
+                <p class="section-description">Perspective vs. orthographic</p>
+            </div>
+            
+            <div class="photo-grid">
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <div class="photo-label">Perspective</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
+                        <img src="Photo5.png" alt="Perspective projection">
+                    </div>
+                    <div class="photo-info">
+                        <div class="photo-title">Perspective Projection</div>
+                        <div class="photo-subtitle">Lines converge to vanishing points</div>
+                    </div>
+                </div>
+                
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <div class="photo-label">Orthographic</div>
+                        <button class="fit-toggle" title="Toggle fit mode">↔</button>
+                        <img src="Photo6.png" alt="Orthographic projection">
+                    </div>
+                    <div class="photo-info">
+                        <div class="photo-title">Orthographic-like</div>
+                        <div class="photo-subtitle">Parallel lines stay parallel</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h3>Analysis</h3>
+                <p><strong>Perspective:</strong> How cameras/eyes see. Parallel lines converge (red annotations show vanishing points). Creates 3D depth.</p>
+                <p><strong>Orthographic:</strong> Used in technical drawings. Parallel lines stay parallel. Approximated via extreme distance + zoom or center crop.</p>
+                <p><strong>CV Relevance:</strong> Perspective requires camera calibration (focal length, distortion). Orthographic simplifies algorithms—used in satellite imagery, medical scans. 3D reconstruction must account for perspective distortion.</p>
+            </div>
+
+            <div class="vote-section">
+                <button class="vote-btn upvote" id="up-3" onclick="vote(3, 'up')">Upvote</button>
+                <div class="vote-count" id="votes-3">0 votes</div>
+                <button class="vote-btn downvote" id="down-3" onclick="vote(3, 'down')">Downvote</button>
+            </div>
+        </section>
     </div>
+
+    <footer>
+        <p>CS-4912: Computer Vision • Spring 2026</p>
+        <p>Professor Raghavendra Singh</p>
+    </footer>
+
+    <!-- Modal element (shared for all images) -->
+    <div id="modal" class="modal" onclick="closeModal(event)">
+        <button class="modal-close" aria-label="Close" onclick="closeModal(event)">✕</button>
+        <div class="modal-content">
+            <img id="modalImg" src="" alt="expanded">
+        </div>
+        <div id="modalCaption" class="modal-caption" aria-hidden="true"></div>
+    </div>
+
+    <script>
+        // ==== CONFIG: set this to your Apps Script Web App URL ====
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyil8lSZij_KQ39GaPEwrKmKGzW3zk1eax5wWhWW4bGAK17ZZ6-j0NcathwoQ7zkWVLhg/exec'; // <-- REPLACE
+
+        // progress bar (unchanged)
+        window.addEventListener('scroll', () => {
+            const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = window.scrollY;
+            document.getElementById('progressBar').style.width = (scrolled / scrollable * 100) + '%';
+        });
+
+        // intersection observer for reveal (unchanged)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.section').forEach(section => observer.observe(section));
+
+        /* ==========================
+           AUTHENTICATED VOTING LOGIC
+           - requires Apps Script deployed as web app "Execute as: User accessing the web app"
+           - client fetches must include credentials and origin query param
+           ========================== */
+
+        // helper: build webapp URL with origin param
+        function webappUrlWithOrigin() {
+            const origin = location.origin;
+            return WEBAPP_URL + (WEBAPP_URL.indexOf('?') === -1 ? '?' : '&') + 'origin=' + encodeURIComponent(origin);
+        }
+
+        // fetch counts (GET) - include credentials so request is authenticated with Google cookie
+        async function fetchCounts() {
+            try {
+                const res = await fetch(webappUrlWithOrigin(), { method: 'GET', credentials: 'include' });
+                const j = await res.json();
+                if (j && j.success && j.counts) {
+                    updateDisplay(1, j.counts);
+                    updateDisplay(2, j.counts);
+                    updateDisplay(3, j.counts);
+                }
+            } catch (err) {
+                console.warn('Could not fetch counts:', err);
+            }
+        }
+
+        function updateDisplay(section, counts) {
+            const count = (counts && counts[String(section)]) ? counts[String(section)] : 0;
+            const text = Math.abs(count) === 1 ? 'vote' : 'votes';
+            const el = document.getElementById(`votes-${section}`);
+            if (el) el.textContent = `${count} ${text}`;
+        }
+
+        // disable / enable vote buttons UI
+        function disableVoteButtons(section, disable) {
+            const up = document.getElementById(`up-${section}`);
+            const down = document.getElementById(`down-${section}`);
+            if (up) { up.disabled = disable; up.style.opacity = disable ? 0.6 : 1; }
+            if (down) { down.disabled = disable; down.style.opacity = disable ? 0.6 : 1; }
+        }
+
+        // send vote to server (POST) with credentials: 'include'
+        async function sendVote(section, type) {
+            try {
+                const res = await fetch(webappUrlWithOrigin(), {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ section: String(section), type: String(type) })
+                });
+                const j = await res.json();
+                return j;
+            } catch (err) {
+                return { success: false, error: 'network' };
+            }
+        }
+
+        // main vote function called by buttons
+        async function vote(section, type) {
+            // disable UI while in flight
+            disableVoteButtons(section, true);
+
+            const result = await sendVote(section, type);
+            if (!result) {
+                alert('Network error. Try again later.');
+                disableVoteButtons(section, false);
+                return;
+            }
+
+            if (result.success) {
+                // server appended vote; update counts and disable buttons (server enforces uniqueness by email)
+                updateDisplay(section, result.counts || {});
+                disableVoteButtons(section, true);
+                alert('Thank you — your vote is recorded.');
+                return;
+            }
+
+            // handle server errors
+            if (result.error === 'not_signed_in') {
+                // user must sign in: open web app URL (user has to sign in there), then retry after they return
+                const authUrl = webappUrlWithOrigin() + '&action=signin';
+                // open a small popup to prompt sign-in
+                window.open(authUrl, '_blank', 'width=600,height=700');
+                alert('Please sign in to your Google account in the newly opened tab (use your @ashoka.edu.in account), then click vote again.');
+                disableVoteButtons(section, false);
+                return;
+            }
+
+            if (result.error === 'forbidden_domain') {
+                alert('Voting is restricted to class (ashoka.edu.in) accounts only.');
+                disableVoteButtons(section, true);
+                return;
+            }
+
+            if (result.error === 'already_voted') {
+                updateDisplay(section, result.counts || {});
+                alert('Our records show you already voted for this submission.');
+                disableVoteButtons(section, true);
+                return;
+            }
+
+            // other errors
+            alert('Vote failed: ' + (result.error || 'unknown'));
+            disableVoteButtons(section, false);
+        }
+
+        // initialize: fetch counts and set button states
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Attempt to fetch counts and set UI
+            await fetchCounts();
+
+            // We cannot fully know whether the user already voted (server only knows via email).
+            // Buttons remain enabled; if they click and server replies 'already_voted', UI will reflect that.
+        });
+
+        /* === Modal & fit-toggle logic (unchanged) === */
+        function openModal(imgSrc, caption) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modalImg');
+            const modalCaption = document.getElementById('modalCaption');
+            modalImg.src = imgSrc;
+            modalCaption.textContent = caption || '';
+            modal.classList.add('open');
+        }
+
+        function closeModal(e) {
+            if (e && e.target && (e.target.classList.contains('modal') || e.target.classList.contains('modal-close'))) {
+                const modal = document.getElementById('modal');
+                modal.classList.remove('open');
+                document.getElementById('modalImg').src = '';
+                document.getElementById('modalCaption').textContent = '';
+            }
+        }
+
+        document.querySelectorAll('.photo-card').forEach(card => {
+            const wrapper = card.querySelector('.photo-wrapper');
+            const img = card.querySelector('img');
+            const toggle = card.querySelector('.fit-toggle');
+
+            wrapper.addEventListener('click', (ev) => {
+                if (ev.target === toggle || toggle.contains(ev.target)) return;
+                const src = img.getAttribute('src') || img.src;
+                const caption = img.getAttribute('alt') || '';
+                openModal(src, caption);
+            });
+
+            toggle.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                if (card.classList.contains('contain')) {
+                    card.classList.remove('contain');
+                    toggle.textContent = '↔';
+                    toggle.title = 'Show full bleed (cover)';
+                } else {
+                    card.classList.add('contain');
+                    toggle.textContent = '⤢';
+                    toggle.title = 'Fit image inside box (contain)';
+                }
+            });
+
+            toggle.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    toggle.click();
+                }
+            });
+        });
+
+        window.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Escape') {
+                const modal = document.getElementById('modal');
+                if (modal.classList.contains('open')) {
+                    closeModal({ target: modal });
+                }
+            }
+        });
+
+        // image error fallback
+        document.querySelectorAll('.photo-card img').forEach(img => {
+            img.addEventListener('error', () => {
+                const placeholder = '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="48%" fill="#64748b" font-size="28" text-anchor="middle">Missing image</text><text x="50%" y="58%" fill="#94a3b8" font-size="20" text-anchor="middle">Upload PhotoX.png to the repo</text></svg>';
+                img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(placeholder);
+            });
+        });
+
+    </script>
 </body>
 </html>
