@@ -6,7 +6,7 @@
     <title>Assignment 2 - Corner Detection and Feature Matching</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body>
@@ -14,35 +14,29 @@
 
     <div class="site-shell">
         <header class="topbar reveal">
-            <a class="back-link" href="../">Back to portfolio</a>
-            <div class="topbar-note">Assignment 02</div>
+            <a class="back-link" href="../">Back</a>
+            <div class="topbar-note">Assignment 2</div>
         </header>
 
         <main class="content-stack">
             <section class="hero-panel reveal">
                 <div class="hero-grid">
                     <div>
-                        <p class="eyebrow">Corner Detection and Feature Matching</p>
-                        <h1 class="page-title">Assignment 2</h1>
+                        <p class="eyebrow">Computer Vision</p>
+                        <h1 class="page-title">Corner Detection and Feature Matching</h1>
                         <p class="lede">
-                            This assignment covers two core computer vision tasks: Harris corner detection
-                            with evaluation against manual annotations, and SIFT feature matching across
-                            sequential and random image pairs.
+                            This assignment covers Harris corner detection and SIFT feature matching.
                         </p>
                     </div>
 
                     <div class="hero-aside">
                         <div class="meta-card">
-                            <span class="meta-label">Course</span>
-                            <div class="meta-value">CS-4932 Computer Vision</div>
-                        </div>
-                        <div class="meta-card">
                             <span class="meta-label">Student</span>
                             <div class="meta-value">Shreenand Bhattad</div>
                         </div>
                         <div class="meta-card">
-                            <span class="meta-label">Deliverable</span>
-                            <div class="meta-value">Notebook resources and objectives</div>
+                            <span class="meta-label">Course</span>
+                            <div class="meta-value">CS-4932 Computer Vision</div>
                         </div>
                     </div>
                 </div>
@@ -51,40 +45,9 @@
             <section class="section-card reveal">
                 <div class="section-heading">
                     <div>
-                        <p class="section-kicker">Overview</p>
-                        <h2 class="section-title">Work Summary</h2>
-                        <p class="section-summary">
-                            The page is now structured around two formal sections, with resource links
-                            kept separate from the task descriptions so the content is easier to scan.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="summary-grid">
-                    <article class="summary-card">
-                        <span class="label">Part A</span>
-                        <div class="card-title">Harris Corner Detection</div>
-                        <p class="card-copy">Threshold analysis, precision-recall evaluation, and comparison against manually labeled corners.</p>
-                    </article>
-                    <article class="summary-card">
-                        <span class="label">Part B</span>
-                        <div class="card-title">SIFT Matching</div>
-                        <p class="card-copy">Descriptor extraction and matching cost comparison for sequential versus random image pairs.</p>
-                    </article>
-                    <article class="summary-card">
-                        <span class="label">Status</span>
-                        <div class="card-title">Repository Cleanup</div>
-                        <p class="card-copy">Dead file references were removed and the remaining notebook was relocated into the assignment folder.</p>
-                    </article>
-                </div>
-            </section>
-
-            <section class="section-card reveal" id="part-a">
-                <div class="section-heading">
-                    <div>
                         <p class="section-kicker">Part A</p>
                         <h2 class="section-title">Harris Corner Detection</h2>
-                        <p class="section-summary">Precision-recall analysis using manually selected ground-truth corners.</p>
+                        <p class="section-summary">Precision and recall analysis using manually marked corners.</p>
                     </div>
                 </div>
 
@@ -92,39 +55,32 @@
                     <div class="analysis-panel">
                         <h3>Objectives</h3>
                         <ol class="objective-list">
-                            <li>Capture a building image with clearly visible structural corners.</li>
-                            <li>Manually annotate approximately 40 to 60 corners as ground truth.</li>
-                            <li>Run the Harris detector under multiple threshold values.</li>
-                            <li>Measure precision and recall at each threshold.</li>
-                            <li>Visualize detected corners and summarize the resulting trade-offs.</li>
-                            <li>Plot the precision-recall curve and estimate area under the curve.</li>
+                            <li>Capture a building image with visible corners.</li>
+                            <li>Mark about 40 to 60 corners as ground truth.</li>
+                            <li>Run the Harris detector with different thresholds.</li>
+                            <li>Measure precision and recall for each threshold.</li>
+                            <li>Visualize the detected corners.</li>
+                            <li>Plot the precision-recall curve.</li>
                         </ol>
                     </div>
 
                     <aside class="note-card">
-                        <h3>Repository Note</h3>
-                        <p class="note-copy">
-                            A Part A notebook or Colab link was not present in the repository, so this section
-                            keeps the assignment brief without pointing to broken files.
-                        </p>
+                        <h3>Note</h3>
+                        <p class="note-copy">A Part A notebook was not included in the repository.</p>
                     </aside>
                 </div>
 
-                <div class="resource-grid" style="margin-top: 18px;">
-                    <div class="resource-card">
-                        <span class="label">Availability</span>
-                        <p class="resource-copy">Notebook resource not included in the current repository snapshot.</p>
-                    </div>
+                <div class="resource-grid" style="margin-top: 16px;">
                     <span class="resource-link is-muted" aria-disabled="true">Notebook unavailable</span>
                 </div>
             </section>
 
-            <section class="section-card reveal" id="part-b">
+            <section class="section-card reveal">
                 <div class="section-heading">
                     <div>
                         <p class="section-kicker">Part B</p>
                         <h2 class="section-title">SIFT Feature Matching</h2>
-                        <p class="section-summary">Comparing the total matching cost of sequential image pairs against random pairings.</p>
+                        <p class="section-summary">Comparing sequential image pairs with random pairs.</p>
                     </div>
                 </div>
 
@@ -132,25 +88,22 @@
                     <div class="analysis-panel">
                         <h3>Objectives</h3>
                         <ol class="objective-list">
-                            <li>Extract SIFT keypoints and descriptors from the mulch stack image set.</li>
+                            <li>Extract SIFT keypoints and descriptors.</li>
                             <li>Match features between consecutive image pairs.</li>
-                            <li>Calculate the total matching cost for sequential pairs.</li>
-                            <li>Repeat the matching process for random image pairs.</li>
-                            <li>Compare the resulting costs and summarize the observed behavior.</li>
+                            <li>Calculate the total matching cost.</li>
+                            <li>Repeat the process for random pairs.</li>
+                            <li>Compare the results.</li>
                         </ol>
                     </div>
 
                     <aside class="note-card">
-                        <h3>Available Resource</h3>
-                        <p class="note-copy">
-                            The Part B notebook is stored directly in this folder, which keeps the page
-                            links tidy and makes the repository structure easier to follow.
-                        </p>
+                        <h3>Notebook</h3>
+                        <p class="note-copy">The Part B notebook is available in this folder.</p>
                     </aside>
                 </div>
 
-                <div class="resource-grid" style="margin-top: 18px;">
-                    <a class="resource-link" href="https://colab.research.google.com/drive/16YFFBX5H4x2gXPa-3Tumf9ogDVDdnyLw?usp=sharing" target="_blank" rel="noreferrer">Open in Google Colab</a>
+                <div class="resource-grid" style="margin-top: 16px;">
+                    <a class="resource-link" href="https://colab.research.google.com/drive/16YFFBX5H4x2gXPa-3Tumf9ogDVDdnyLw?usp=sharing" target="_blank" rel="noreferrer">Open in Colab</a>
                     <a class="resource-link is-secondary" href="PartB.ipynb" download>Download Notebook</a>
                     <a class="resource-link is-secondary" href="https://nbviewer.org/github/Shreenandbhattad/Computer-Vision-CS-4932/blob/main/assignment-2/PartB.ipynb" target="_blank" rel="noreferrer">View in nbviewer</a>
                 </div>
@@ -158,7 +111,7 @@
         </main>
 
         <footer class="site-footer">
-            <p>Shreenand Bhattad - CS-4932 Computer Vision - Spring 2026</p>
+            <p>Shreenand Bhattad - CS-4932 Computer Vision</p>
         </footer>
     </div>
 

@@ -6,7 +6,7 @@
     <title>Assignment 1 - Photography and Perspective</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body>
@@ -14,35 +14,30 @@
 
     <div class="site-shell">
         <header class="topbar reveal">
-            <a class="back-link" href="../">Back to portfolio</a>
-            <div class="topbar-note">Assignment 01</div>
+            <a class="back-link" href="../">Back</a>
+            <div class="topbar-note">Assignment 1</div>
         </header>
 
         <main class="content-stack">
             <section class="hero-panel reveal">
                 <div class="hero-grid">
                     <div>
-                        <p class="eyebrow">Photography and Perspective</p>
-                        <h1 class="page-title">Assignment 1</h1>
+                        <p class="eyebrow">Computer Vision</p>
+                        <h1 class="page-title">Photography and Perspective</h1>
                         <p class="lede">
-                            This assignment studies how camera position changes perceived geometry.
-                            The comparisons below show portrait distortion, telephoto compression,
-                            and the visual difference between perspective and orthographic-style views.
+                            This assignment compares how camera distance changes perspective in portraits,
+                            street scenes, and projection examples.
                         </p>
                     </div>
 
                     <div class="hero-aside">
                         <div class="meta-card">
-                            <span class="meta-label">Course</span>
-                            <div class="meta-value">CS-4932 Computer Vision</div>
-                        </div>
-                        <div class="meta-card">
                             <span class="meta-label">Student</span>
                             <div class="meta-value">Shreenand Bhattad</div>
                         </div>
                         <div class="meta-card">
-                            <span class="meta-label">Focus</span>
-                            <div class="meta-value">Perspective, distance, projection</div>
+                            <span class="meta-label">Course</span>
+                            <div class="meta-value">CS-4932 Computer Vision</div>
                         </div>
                     </div>
                 </div>
@@ -51,28 +46,9 @@
             <section class="section-card reveal">
                 <div class="section-heading">
                     <div>
-                        <p class="section-kicker">Overview</p>
-                        <h2 class="section-title">Key Observations</h2>
-                        <p class="section-summary">
-                            The central lesson is consistent across all three comparisons:
-                            distance changes perspective, while zoom primarily changes framing.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="pill-row">
-                    <span class="pill">Portrait distortion becomes stronger at close range.</span>
-                    <span class="pill">Telephoto images visually compress depth.</span>
-                    <span class="pill">Orthographic-style views preserve parallel structure.</span>
-                </div>
-            </section>
-
-            <section class="section-card reveal" id="portrait">
-                <div class="section-heading">
-                    <div>
-                        <p class="section-kicker">Part 01</p>
+                        <p class="section-kicker">Part 1</p>
                         <h2 class="section-title">Portrait Perspective</h2>
-                        <p class="section-summary">A close camera exaggerates facial depth, while stepping back normalizes proportions.</p>
+                        <p class="section-summary">Close distance versus stepping back.</p>
                     </div>
                 </div>
 
@@ -87,7 +63,7 @@
                                 <button class="photo-action is-secondary" type="button" data-fit-toggle aria-pressed="false">Fit</button>
                             </div>
                             <h3 class="photo-title">Close Distance</h3>
-                            <p class="photo-caption">Camera near the subject with no zoom, producing stronger geometric exaggeration.</p>
+                            <p class="photo-caption">The camera is near the subject, so facial features look more distorted.</p>
                         </div>
                     </article>
 
@@ -101,30 +77,24 @@
                                 <button class="photo-action is-secondary" type="button" data-fit-toggle aria-pressed="false">Fit</button>
                             </div>
                             <h3 class="photo-title">Stepped Back</h3>
-                            <p class="photo-caption">The camera moves farther away and zoom compensates for framing, preserving natural proportions.</p>
+                            <p class="photo-caption">Moving farther away gives a more natural look.</p>
                         </div>
                     </article>
                 </div>
 
                 <div class="analysis-panel">
                     <h3>Analysis</h3>
-                    <p>
-                        In the first image, the subject is very close to the camera, so the nose is much nearer to the lens than the ears.
-                        That distance difference stretches the face and creates visible distortion.
-                    </p>
-                    <p>
-                        In the second image, moving the camera back reduces relative depth differences across the face.
-                        Zoom restores framing, but it does not create the perspective change by itself.
-                    </p>
+                    <p>Perspective changes because of camera distance, not because of zoom.</p>
+                    <p>When the camera is closer, depth differences across the face are stronger and distortion increases.</p>
                 </div>
             </section>
 
-            <section class="section-card reveal" id="street">
+            <section class="section-card reveal">
                 <div class="section-heading">
                     <div>
-                        <p class="section-kicker">Part 02</p>
+                        <p class="section-kicker">Part 2</p>
                         <h2 class="section-title">Street Compression</h2>
-                        <p class="section-summary">Comparing a distant telephoto view with a closer, more natural street perspective.</p>
+                        <p class="section-summary">Far and zoomed versus closer to the scene.</p>
                     </div>
                 </div>
 
@@ -139,7 +109,7 @@
                                 <button class="photo-action is-secondary" type="button" data-fit-toggle aria-pressed="false">Fit</button>
                             </div>
                             <h3 class="photo-title">Far and Zoomed</h3>
-                            <p class="photo-caption">A longer shooting distance makes foreground and background appear visually compressed.</p>
+                            <p class="photo-caption">Objects appear flatter and closer together.</p>
                         </div>
                     </article>
 
@@ -153,30 +123,24 @@
                                 <button class="photo-action is-secondary" type="button" data-fit-toggle aria-pressed="false">Fit</button>
                             </div>
                             <h3 class="photo-title">Closer Position</h3>
-                            <p class="photo-caption">Moving closer restores stronger separation between objects and reveals natural spatial depth.</p>
+                            <p class="photo-caption">The scene keeps more natural depth and separation.</p>
                         </div>
                     </article>
                 </div>
 
                 <div class="analysis-panel">
                     <h3>Analysis</h3>
-                    <p>
-                        The distant telephoto view reduces the apparent spacing between objects because everything lies at roughly similar depth from the lens.
-                        This creates the compressed look often associated with long focal lengths.
-                    </p>
-                    <p>
-                        When the camera moves closer, differences in object distance become more pronounced.
-                        The scene gains depth and layering, which is more faithful to how the space feels in person.
-                    </p>
+                    <p>A long shooting distance compresses the scene.</p>
+                    <p>Moving closer makes the depth between objects easier to see.</p>
                 </div>
             </section>
 
-            <section class="section-card reveal" id="projection">
+            <section class="section-card reveal">
                 <div class="section-heading">
                     <div>
-                        <p class="section-kicker">Part 03</p>
-                        <h2 class="section-title">Projection Systems</h2>
-                        <p class="section-summary">Perspective projection conveys depth, while orthographic-style views preserve parallel edges.</p>
+                        <p class="section-kicker">Part 3</p>
+                        <h2 class="section-title">Projection Types</h2>
+                        <p class="section-summary">Perspective versus orthographic-style view.</p>
                     </div>
                 </div>
 
@@ -191,7 +155,7 @@
                                 <button class="photo-action is-secondary" type="button" data-fit-toggle aria-pressed="false">Fit</button>
                             </div>
                             <h3 class="photo-title">Perspective Projection</h3>
-                            <p class="photo-caption">Parallel lines converge toward vanishing points and create a stronger depth cue.</p>
+                            <p class="photo-caption">Parallel lines appear to meet at vanishing points.</p>
                         </div>
                     </article>
 
@@ -205,27 +169,21 @@
                                 <button class="photo-action is-secondary" type="button" data-fit-toggle aria-pressed="false">Fit</button>
                             </div>
                             <h3 class="photo-title">Orthographic-Style View</h3>
-                            <p class="photo-caption">Parallel structure is preserved, which simplifies interpretation in technical contexts.</p>
+                            <p class="photo-caption">Parallel lines stay parallel and the view looks flatter.</p>
                         </div>
                     </article>
                 </div>
 
                 <div class="analysis-panel">
                     <h3>Analysis</h3>
-                    <p>
-                        Perspective projection matches everyday camera imaging, so lines that are parallel in the world may converge in the image.
-                        This is crucial in computer vision because the camera model must account for those projective effects.
-                    </p>
-                    <p>
-                        Orthographic-style projection suppresses convergence and is often easier to analyze for measurement and drafting.
-                        It provides a useful contrast when studying camera geometry and scene interpretation.
-                    </p>
+                    <p>Perspective projection is closer to how a normal camera sees the world.</p>
+                    <p>Orthographic-style projection removes convergence and is simpler for technical views.</p>
                 </div>
             </section>
         </main>
 
         <footer class="site-footer">
-            <p>Shreenand Bhattad - CS-4932 Computer Vision - Spring 2026</p>
+            <p>Shreenand Bhattad - CS-4932 Computer Vision</p>
         </footer>
     </div>
 

@@ -1,6 +1,6 @@
-# CS-4932 Computer Vision Portfolio
+# CS-4932 Computer Vision Website
 
-A formal static portfolio for Computer Vision course assignments.
+A simple static website for Computer Vision course assignments.
 
 ## Live Site
 
@@ -29,7 +29,7 @@ https://shreenandbhattad.github.io/Computer-Vision-CS-4932/
 - Replaced the previous blue-heavy styling with a monochrome black, white, and gray design
 - Added shared CSS and JavaScript for smoother transitions, reveal animations, and image modal behavior
 - Cleaned up broken resource references in Assignment 2
-- Updated the landing page to better present the course portfolio
+- Simplified the landing page and assignment pages
 
 ## Local Preview
 
