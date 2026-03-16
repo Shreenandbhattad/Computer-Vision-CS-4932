@@ -15,30 +15,14 @@
     <div class="site-shell">
         <header class="topbar reveal">
             <a class="back-link" href="../">Back</a>
-            <div class="topbar-note">Assignment 1</div>
         </header>
 
         <main class="content-stack">
-            <section class="hero-panel reveal">
-                <div class="hero-grid">
+            <section class="section-card reveal">
+                <div class="section-heading">
                     <div>
-                        <p class="eyebrow">Computer Vision</p>
-                        <h1 class="page-title">Photography and Perspective</h1>
-                        <p class="lede">
-                            This assignment compares how camera distance changes perspective in portraits,
-                            street scenes, and projection examples.
-                        </p>
-                    </div>
-
-                    <div class="hero-aside">
-                        <div class="meta-card">
-                            <span class="meta-label">Student</span>
-                            <div class="meta-value">Shreenand Bhattad</div>
-                        </div>
-                        <div class="meta-card">
-                            <span class="meta-label">Course</span>
-                            <div class="meta-value">CS-4932 Computer Vision</div>
-                        </div>
+                        <h1 class="section-title">Assignment 1</h1>
+                        <p class="section-summary">Photography and Perspective</p>
                     </div>
                 </div>
             </section>
@@ -48,7 +32,6 @@
                     <div>
                         <p class="section-kicker">Part 1</p>
                         <h2 class="section-title">Portrait Perspective</h2>
-                        <p class="section-summary">Close distance versus stepping back.</p>
                     </div>
                 </div>
 
@@ -83,9 +66,7 @@
                 </div>
 
                 <div class="analysis-panel">
-                    <h3>Analysis</h3>
                     <p>Perspective changes because of camera distance, not because of zoom.</p>
-                    <p>When the camera is closer, depth differences across the face are stronger and distortion increases.</p>
                 </div>
             </section>
 
@@ -94,7 +75,6 @@
                     <div>
                         <p class="section-kicker">Part 2</p>
                         <h2 class="section-title">Street Compression</h2>
-                        <p class="section-summary">Far and zoomed versus closer to the scene.</p>
                     </div>
                 </div>
 
@@ -129,9 +109,7 @@
                 </div>
 
                 <div class="analysis-panel">
-                    <h3>Analysis</h3>
                     <p>A long shooting distance compresses the scene.</p>
-                    <p>Moving closer makes the depth between objects easier to see.</p>
                 </div>
             </section>
 
@@ -140,7 +118,6 @@
                     <div>
                         <p class="section-kicker">Part 3</p>
                         <h2 class="section-title">Projection Types</h2>
-                        <p class="section-summary">Perspective versus orthographic-style view.</p>
                     </div>
                 </div>
 
@@ -175,23 +152,17 @@
                 </div>
 
                 <div class="analysis-panel">
-                    <h3>Analysis</h3>
                     <p>Perspective projection is closer to how a normal camera sees the world.</p>
-                    <p>Orthographic-style projection removes convergence and is simpler for technical views.</p>
                 </div>
             </section>
         </main>
 
-        <footer class="site-footer">
-            <p>Shreenand Bhattad - CS-4932 Computer Vision</p>
-        </footer>
-    </div>
-
-    <div class="modal" id="imageModal" aria-hidden="true">
-        <div class="modal-dialog">
-            <button class="modal-close" id="modalClose" type="button" aria-label="Close image viewer">&times;</button>
-            <img class="modal-image" id="modalImage" src="" alt="">
-            <p class="modal-caption" id="modalCaption"></p>
+        <div class="modal" id="imageModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <button class="modal-close" id="modalClose" type="button" aria-label="Close image viewer">&times;</button>
+                <img class="modal-image" id="modalImage" src="" alt="">
+                <p class="modal-caption" id="modalCaption"></p>
+            </div>
         </div>
     </div>
 
