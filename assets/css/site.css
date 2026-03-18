@@ -210,6 +210,10 @@ button {
     overflow: hidden;
 }
 
+.photo-frame.is-wide {
+    aspect-ratio: 4 / 3;
+}
+
 .photo-frame img {
     width: 100%;
     height: 100%;
@@ -288,6 +292,69 @@ button {
 
 .analysis-panel p + p {
     margin-top: 10px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+}
+
+.data-table th,
+.data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.data-table th {
+    background: var(--surface-soft);
+    font-weight: 700;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+}
+
+.overlay-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+        border-color var(--duration-base) ease,
+        transform var(--duration-base) ease;
+}
+
+.overlay-card:hover {
+    transform: translateY(-1px);
+    border-color: var(--border-strong);
+}
+
+.overlay-card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: #efefef;
+}
+
+.overlay-card span {
+    display: block;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    color: var(--muted);
 }
 
 .modal {
