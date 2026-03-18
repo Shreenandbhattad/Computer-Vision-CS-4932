@@ -122,19 +122,6 @@ window.addEventListener("keydown", (event) => {
     }
 });
 
-document.querySelectorAll("[data-fit-toggle]").forEach((button) => {
-    button.addEventListener("click", () => {
-        const card = button.closest(".photo-card");
-        if (!card) {
-            return;
-        }
-
-        const isContained = card.classList.toggle("is-contained");
-        button.textContent = isContained ? "Fill" : "Fit";
-        button.setAttribute("aria-pressed", String(isContained));
-    });
-});
-
 document.querySelectorAll("img").forEach((image) => {
     image.addEventListener("error", () => {
         image.style.objectFit = "contain";
