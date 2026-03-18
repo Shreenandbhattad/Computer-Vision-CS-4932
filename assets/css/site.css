@@ -190,17 +190,14 @@ button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: fit-content;
-    min-height: 42px;
-    padding: 0 14px;
+    width: 42px;
+    height: 42px;
     margin-bottom: 14px;
-    border-radius: 999px;
+    border-radius: 50%;
     border: 1px solid var(--border);
     background: var(--surface-soft);
     font-size: 0.9rem;
     font-weight: 700;
-    line-height: 1;
-    white-space: nowrap;
 }
 
 .photo-card {
