@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Final Project - Khana</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+    <div class="scroll-progress" id="scrollProgress"></div>
+    <div class="site-shell">
+        <header class="topbar reveal">
+            <a class="back-link" href="../">Back</a>
+        </header>
+
+        <main class="content-stack">
+
+            <section class="section-card reveal">
+                <div class="section-heading">
+                    <h1 class="section-title">Final Project</h1>
+                    <p class="section-summary">Khana – Indian Food Classification and Detection</p>
+                </div>
+            </section>
+
+            <section class="section-card reveal">
+                <div class="section-heading">
+                    <h2 class="section-title">Results</h2>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Part</th><th>Method</th><th>Result</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1 – Classification</td><td>ConvNeXt-Base, 2-stage training</td><td>95.87% val acc (baseline 91%)</td></tr>
+                            <tr><td>2 – Detection</td><td>SAM + ConvNeXt classifier</td><td>Khana 80-class labels, Precision/Recall</td></tr>
+                            <tr><td>3 – BEV</td><td>Homography warp + Detection</td><td>Natural image → top-down → detection</td></tr>
+                            <tr><td>Bonus – NeRF</td><td>Coarse+Fine NeRF, ArUco poses</td><td>22 dB PSNR, 20k steps, T4 GPU</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section-card reveal">
+                <div class="section-heading">
+                    <h2 class="section-title">Links</h2>
+                </div>
+                <div class="resource-grid">
+                    <a class="resource-link" href="https://github.com/Shreenandbhattad/Computer-Vision" target="_blank" rel="noreferrer">GitHub Repo</a>
+                    <a class="resource-link is-secondary" href="https://drive.google.com/drive/folders/19LrX4nMFnZsCqTex2JJ9yDm7e4i2vtv4?usp=classroom_web" target="_blank" rel="noreferrer">Google Drive (model weights)</a>
+                </div>
+            </section>
+
+            <section class="section-card reveal">
+                <div class="section-heading">
+                    <p class="section-kicker">Part 1</p>
+                    <h2 class="section-title">Image Classification</h2>
+                    <p class="section-summary">Train a classifier on the Khana dataset and beat the 91% baseline.</p>
+                </div>
+                <div class="analysis-panel">
+                    <p>Used ConvNeXt-Base pretrained on ImageNet-22k. Two-stage training: 224px then 320px finetune. Mixup, cutmix, RandAugment, layer-wise LR decay, and weighted sampling for class balance.</p>
+                    <p>Final val accuracy: <strong>95.87%</strong> — +4.87% above baseline.</p>
+                </div>
+                <div class="resource-grid" style="margin-top:16px">
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/codes/train.py" target="_blank" rel="noreferrer">train.py</a>
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/codes/predict_khana.py" target="_blank" rel="noreferrer">predict_khana.py</a>
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/accuracy.ipynb" target="_blank" rel="noreferrer">accuracy.ipynb</a>
+                </div>
+            </section>
+
+            <section class="section-card reveal">
+                <div class="section-heading">
+                    <p class="section-kicker">Part 2</p>
+                    <h2 class="section-title">Thali Detection</h2>
+                    <p class="section-summary">Detect food items in clean thali images with correct Khana labels.</p>
+                </div>
+                <div class="analysis-panel">
+                    <p>SAM generates food region masks, each crop is passed through the trained ConvNeXt classifier for Khana labels. NMS and confidence filtering clean up detections.</p>
+                    <p>Evaluated by Precision/Recall on labels only.</p>
+                </div>
+                <div class="resource-grid" style="margin-top:16px">
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/codes/detect_thali.py" target="_blank" rel="noreferrer">detect_thali.py</a>
+                </div>
+            </section>
+
+            <section class="section-card reveal">
+                <div class="section-heading">
+                    <p class="section-kicker">Part 3</p>
+                    <h2 class="section-title">BEV Transform + Detection</h2>
+                    <p class="section-summary">Convert natural angled images to bird's eye view, then detect.</p>
+                </div>
+                <div class="analysis-panel">
+                    <p>Interactive mode: click 4 corners of the tray. Auto mode: Hough circle detection. Perspective warp flattens the view before running Part 2 pipeline.</p>
+                    <p>Evaluated qualitatively by visual inspection.</p>
+                </div>
+                <div class="resource-grid" style="margin-top:16px">
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/codes/detect_thali.py" target="_blank" rel="noreferrer">detect_thali.py</a>
+                </div>
+            </section>
+
+            <section class="section-card reveal">
+                <div class="section-heading">
+                    <p class="section-kicker">Bonus</p>
+                    <h2 class="section-title">NeRF of Thaali</h2>
+                    <p class="section-summary">Neural Radiance Field from 51 real thali photos.</p>
+                </div>
+                <div class="analysis-panel">
+                    <p>Camera calibrated with ArUco grid (RMS = 1.21 px). Poses estimated using solvePnP. 2D neural field warmup (34 dB). Full 3D NeRF trained 20k iterations on T4 GPU.</p>
+                    <p>Final PSNR: <strong>22 dB</strong>. Spiral video at 60 frames.</p>
+                </div>
+                <div class="resource-grid" style="margin-top:16px">
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/codes/step0_calibrate.py" target="_blank" rel="noreferrer">step0_calibrate.py</a>
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/codes/step0_pose_and_dataset.py" target="_blank" rel="noreferrer">step0_pose_and_dataset.py</a>
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/codes/step1_neural_field_2d.py" target="_blank" rel="noreferrer">step1_neural_field_2d.py</a>
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/codes/step2_nerf_3d.py" target="_blank" rel="noreferrer">step2_nerf_3d.py</a>
+                    <a class="resource-link is-secondary" href="https://github.com/Shreenandbhattad/Computer-Vision/blob/main/nerf_results/" target="_blank" rel="noreferrer">nerf_results/</a>
+                </div>
+            </section>
+
+            <section class="section-card reveal">
+                <div class="section-heading">
+                    <h2 class="section-title">How to Run</h2>
+                </div>
+                <div class="analysis-panel">
+                    <p><strong>Setup</strong><br>
+                    <code>pip install torch torchvision timm segment-anything opencv-python pillow matplotlib imageio</code></p>
+
+                    <p><strong>Part 1 – Train &amp; Predict</strong><br>
+                    <code>python codes/train.py</code><br>
+                    <code>python codes/predict_khana.py</code></p>
+
+                    <p><strong>Part 2 – Detection</strong><br>
+                    <code>python codes/detect_thali.py path/to/thali.jpg --bev none</code></p>
+
+                    <p><strong>Part 3 – BEV + Detection</strong><br>
+                    <code>python codes/detect_thali.py path/to/thali.jpg --bev interactive</code><br>
+                    <code>python codes/detect_thali.py path/to/thali.jpg --bev auto</code></p>
+
+                    <p><strong>Bonus – NeRF</strong><br>
+                    <code>python codes/step0_calibrate.py</code><br>
+                    <code>python codes/step0_pose_and_dataset.py</code><br>
+                    <code>python codes/step1_neural_field_2d.py --image path/to/image.jpg</code><br>
+                    <code>python codes/step2_nerf_3d.py</code></p>
+
+                    <p>Model weights are on Google Drive (link above).</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+    <script src="../assets/js/site.js"></script>
+</body>
+</html>
